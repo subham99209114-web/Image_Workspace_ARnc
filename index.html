@@ -1,0 +1,1350 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#08111f">
+<meta name="description" content="ResizeImage.ARnc Advanced Professional Studio — local-first image editing, batch processing and export.">
+<title>Image Workspace.ARnc — Advanced Professional Studio</title>
+<style>
+:root{
+  --bg:#07101d;--panel:#0e1a2b;--panel2:#122238;--line:#263a55;
+  --text:#edf5ff;--muted:#9db0c8;--accent:#38d39f;--accent2:#5aa9ff;
+  --danger:#ff647c;--warning:#ffbf69;--shadow:0 18px 55px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:radial-gradient(circle at 15% 0,#153b57 0,#07101d 42%,#050a12 100%);color:var(--text);font-family:Inter,Arial,Helvetica,sans-serif}
+button,input,select,textarea{font:inherit}
+button{border:0;cursor:pointer}
+.app{min-height:100vh;display:grid;grid-template-rows:auto 1fr}
+.topbar{position:sticky;top:0;z-index:50;display:flex;gap:14px;align-items:center;padding:12px 16px;background:rgba(5,12,22,.9);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
+.brand{font-weight:900;white-space:nowrap}.brand small{display:block;color:var(--muted);font-size:10px;font-weight:500;margin-top:2px}
+.top-actions{margin-left:auto;display:flex;gap:7px;flex-wrap:wrap}
+.btn{padding:9px 12px;border-radius:9px;background:#1a2c45;color:var(--text);border:1px solid #304967}
+.btn:hover{filter:brightness(1.15)}.btn.primary{background:linear-gradient(135deg,#20c997,#3ca7ff);color:#031018;font-weight:800}.btn.danger{background:#512031}.btn.ghost{background:transparent}.btn.small{padding:7px 9px;font-size:12px}
+.layout{display:grid;grid-template-columns:275px minmax(0,1fr) 320px;min-height:calc(100vh - 66px)}
+.sidebar,.rightbar{background:rgba(9,20,34,.86);border-right:1px solid var(--line);overflow:auto}
+.rightbar{border-right:0;border-left:1px solid var(--line)}
+.sidebar{padding:14px}.rightbar{padding:14px}
+.section-title{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:#7790ac;margin:12px 4px 8px}
+.toolnav{display:grid;gap:6px}.toolnav button{text-align:left;background:transparent;color:var(--muted);padding:10px;border-radius:9px}.toolnav button.active,.toolnav button:hover{background:#172b44;color:#fff}
+.workspace{min-width:0;display:flex;flex-direction:column}
+.workspace-head{display:flex;gap:8px;align-items:center;padding:12px;border-bottom:1px solid var(--line);overflow:auto}
+.workspace-head .pill{background:#13253a;border:1px solid #29405e;padding:7px 10px;border-radius:999px;font-size:12px;white-space:nowrap}
+.canvas-stage{flex:1;min-height:520px;display:flex;align-items:center;justify-content:center;padding:22px;position:relative;overflow:auto}
+.canvas-wrap{position:relative;display:inline-block;max-width:100%;box-shadow:var(--shadow);background-color:#f8f8f8;background-image:linear-gradient(45deg,#ddd 25%,transparent 25%),linear-gradient(-45deg,#ddd 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#ddd 75%),linear-gradient(-45deg,transparent 75%,#ddd 75%);background-size:24px 24px;background-position:0 0,0 12px,12px -12px,-12px 0}
+#mainCanvas{display:block;max-width:min(100%,650px);max-height:520px;width:auto;height:auto;object-fit:contain}
+.empty{max-width:650px;text-align:center;color:var(--muted);padding:45px;border:1px dashed #38516e;border-radius:18px;background:rgba(255,255,255,.025)}
+.empty h2{color:#fff;margin-top:0}.empty p{line-height:1.7}
+.drop{border:2px dashed #3b668f;border-radius:15px;padding:28px;margin-top:18px;background:rgba(90,169,255,.05)}
+.statusbar{display:flex;gap:10px;align-items:center;padding:8px 12px;background:#081321;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+.panel{display:none}.panel.active{display:block}
+.card{background:linear-gradient(180deg,rgba(20,36,56,.92),rgba(10,24,40,.92));border:1px solid var(--line);border-radius:13px;padding:12px;margin-bottom:10px}
+.card h3{font-size:13px;margin:0 0 10px}.muted{color:var(--muted);font-size:12px}
+.row{display:flex;gap:7px;align-items:center}.row>*{min-width:0}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+label.field{display:block;font-size:11px;color:#9db0c8;margin-bottom:8px}label.field span{display:flex;justify-content:space-between;margin-bottom:5px}
+input[type=range]{width:100%;accent-color:var(--accent)}input[type=text],input[type=number],input[type=color],select,textarea{width:100%;background:#091625;color:#eef5ff;border:1px solid #2a425f;border-radius:8px;padding:8px;outline:none}
+input[type=color]{height:36px;padding:3px}.check{display:flex;gap:7px;align-items:center;font-size:12px;color:#cbd7e6;margin:8px 0}.check input{width:auto}
+.thumb-list{display:grid;gap:7px;max-height:330px;overflow:auto}.thumb{display:grid;grid-template-columns:48px 1fr auto;gap:8px;align-items:center;padding:7px;border-radius:9px;background:#0a1727;border:1px solid transparent}.thumb.active{border-color:var(--accent)}.thumb img{width:48px;height:48px;object-fit:cover;border-radius:6px;background:#fff}.thumb-name{font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.thumb-meta{font-size:10px;color:var(--muted);margin-top:3px}
+.history{max-height:180px;overflow:auto}.history div{font-size:11px;padding:6px 7px;border-bottom:1px solid rgba(255,255,255,.05);color:#aebed1}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:8px}.compare img{width:100%;height:180px;object-fit:contain;background:#fff;border-radius:8px}
+.statgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.stat{padding:9px;background:#0a1727;border-radius:8px}.stat b{display:block;font-size:14px}.stat span{font-size:10px;color:var(--muted)}
+.tag{display:inline-block;padding:3px 7px;border-radius:999px;background:#17304a;color:#a8c9ec;font-size:10px;margin:2px}
+.hidden{display:none!important}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.68);z-index:100;display:none;align-items:center;justify-content:center;padding:15px}.modal.show{display:flex}.modal-box{width:min(720px,100%);max-height:90vh;overflow:auto;background:#0d1b2d;border:1px solid #2e4969;border-radius:15px;padding:18px;box-shadow:var(--shadow)}
+.notice{padding:9px 10px;border-radius:8px;background:#10283e;color:#b8d4ed;font-size:11px;line-height:1.5}
+.toast{position:fixed;right:16px;bottom:16px;z-index:200;background:#12253b;border:1px solid #33506f;padding:11px 14px;border-radius:10px;box-shadow:var(--shadow);display:none;font-size:12px}.toast.show{display:block}
+/* Theme option — preserves the existing layout and controls */
+body.theme-light{--bg:#eef3f8;--panel:#ffffff;--panel2:#f4f7fb;--line:#cbd6e2;--text:#142033;--muted:#5d6d80;--shadow:0 18px 55px rgba(0,0,0,.16);background:radial-gradient(circle at 15% 0,#dcecff 0,#eef3f8 42%,#dfe7f0 100%)}
+body.theme-green{--bg:#06140d;--panel:#0b2116;--panel2:#10301f;--line:#27543a;--text:#ecfff3;--muted:#9fc3ac;background:radial-gradient(circle at 15% 0,#155b36 0,#06140d 42%,#03100a 100%)}
+body.theme-purple{--bg:#100719;--panel:#1b0e29;--panel2:#27143a;--line:#51356b;--text:#fbf1ff;--muted:#c0a9cd;background:radial-gradient(circle at 15% 0,#4d2370 0,#100719 42%,#08040d 100%)}
+body.theme-ocean{--bg:#06131a;--panel:#0b2029;--panel2:#10313e;--line:#28566a;--text:#eafcff;--muted:#9fc4ce;background:radial-gradient(circle at 15% 0,#14556a 0,#06131a 42%,#031015 100%)}
+body.theme-sunset{--bg:#1b0d08;--panel:#29150e;--panel2:#382016;--line:#6b3c2a;--text:#fff5ee;--muted:#d0aea0;background:radial-gradient(circle at 15% 0,#71351f 0,#1b0d08 42%,#0f0704 100%)}
+body.theme-light .topbar{background:rgba(255,255,255,.9)}
+body.theme-light .sidebar,body.theme-light .rightbar{background:rgba(255,255,255,.86)}
+body.theme-light .card{background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(241,246,251,.96))}
+body.theme-light .toolnav button.active,body.theme-light .toolnav button:hover{background:#dce8f5;color:#142033}
+body.theme-light .btn{background:#e7eef6;color:#142033;border-color:#b8c8d8}
+body.theme-light input[type=text],body.theme-light input[type=number],body.theme-light input[type=color],body.theme-light select,body.theme-light textarea{background:#fff;color:#142033;border-color:#b8c8d8}
+@media(max-width:1100px){.layout{grid-template-columns:225px minmax(0,1fr)}.rightbar{display:block}}
+@media(max-width:720px){
+  .layout{display:flex;flex-direction:column;min-height:0}
+  .sidebar,.rightbar{display:block;width:100%;border:0;overflow:visible}
+  .sidebar{padding:10px;border-bottom:1px solid var(--line);background:rgba(9,20,34,.94)}
+  .rightbar{padding:10px;border-top:1px solid var(--line);background:rgba(9,20,34,.94)}
+  .toolnav{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+  .toolnav button{padding:9px;font-size:12px;min-width:0}
+  .sidebar .section-title{margin-top:7px}
+  .workspace{min-height:0;order:2}
+  .sidebar{order:1}
+  .rightbar{order:3}
+  .topbar{position:sticky;top:0;align-items:flex-start;flex-direction:column;padding:10px;gap:8px}
+  .top-actions{width:100%;margin-left:0;overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px}
+  .top-actions .btn{flex:0 0 auto}
+  .canvas-stage{min-height:360px;height:auto;padding:8px;overflow:auto;align-items:center}
+  .workspace-head{overflow-x:auto;padding:8px;flex-wrap:nowrap}
+  .grid2{grid-template-columns:1fr 1fr}
+  .grid3{grid-template-columns:1fr 1fr}
+  .compare{grid-template-columns:1fr}
+  .canvas-wrap{width:100%;max-width:100%;overflow:hidden}
+  #mainCanvas{width:100%;height:auto;max-width:100%;max-height:none;touch-action:none}
+  .card{padding:10px}
+  .row{flex-wrap:wrap}
+  .row .btn{flex:1 1 auto}
+  .modal-box{max-height:88vh;padding:12px}
+  .thumb-list{max-height:260px}
+}
+@media(max-width:430px){.toolnav{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}.canvas-stage{min-height:300px}.empty{padding:24px 14px}.btn{padding:8px 9px}}
+
+/* ===== ARnc Remini-style Smart Clean ADD-ON — local/browser only ===== */
+.cleanPanel{display:none}.cleanPanel.active{display:block}.cleanHero{background:linear-gradient(135deg,rgba(56,211,159,.16),rgba(90,169,255,.12));border:1px solid rgba(90,169,255,.35)}
+.cleanBadge{display:inline-block;background:linear-gradient(135deg,#20c997,#3ca7ff);color:#031018;font-weight:900;padding:4px 8px;border-radius:999px;font-size:10px;margin-left:5px}
+.cleanGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.cleanGrid3{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.cleanActions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.cleanActions .btn{margin:0}.cleanProgress{height:9px;background:#081321;border-radius:999px;overflow:hidden;margin-top:9px;display:none}.cleanProgress>i{display:block;height:100%;width:0;background:linear-gradient(90deg,#20c997,#5aa9ff);transition:width .15s}.cleanResult{font-size:11px;color:var(--muted);line-height:1.55;margin-top:8px}.cleanToggle{display:flex;gap:7px;align-items:center;font-size:11px;color:#cbd7e6;margin-top:8px}.cleanToggle input{width:auto}.cleanPreview{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}.cleanPreview canvas{width:100%;height:115px;object-fit:contain;background:#fff;border-radius:7px}.cleanMini{font-size:10px;color:var(--muted);text-align:center;margin-top:4px}.cleanNote{padding:8px;border-radius:8px;background:rgba(90,169,255,.08);font-size:10px;color:#b8d4ed;line-height:1.45;margin-top:8px}
+@media(max-width:720px){.cleanGrid3{grid-template-columns:1fr 1fr}.cleanPreview{grid-template-columns:1fr}}
+@media(max-width:430px){.cleanGrid,.cleanGrid3,.cleanActions{grid-template-columns:1fr}}
+
+/* ===== Screenshot-inspired Remini AI Toolbar add-on ===== */
+.cleanToolbar{display:grid;grid-template-columns:1fr 1fr;gap:8px}.cleanToolBtn{position:relative;text-align:left;min-height:54px;padding:9px 10px}.cleanToolBtn b{display:block;font-size:12px}.cleanToolBtn small{display:block;color:var(--muted);font-size:9px;margin-top:2px}.cleanToolBtn.active{outline:2px solid rgba(90,169,255,.65);background:linear-gradient(135deg,rgba(90,169,255,.18),rgba(32,201,151,.12))}.cleanToolDot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px;background:#20c997}.cleanCompare{position:relative;width:100%;height:250px;border-radius:10px;overflow:hidden;background:#050b12;border:1px solid var(--line);touch-action:none}.cleanCompare canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}.cleanCompare .cleanAfterLayer{position:absolute;top:0;bottom:0;left:50%;width:50%;overflow:hidden;border-left:2px solid #fff;box-shadow:-4px 0 12px rgba(0,0,0,.25)}.cleanCompare .cleanAfterLayer canvas{position:absolute;left:-100%;top:0;width:200%;height:100%;object-fit:contain;object-position:left center;max-width:none}.cleanCompareLabels{position:absolute;top:9px;left:9px;right:9px;display:flex;justify-content:space-between;pointer-events:none}.cleanCompareLabels span{background:rgba(0,0,0,.58);color:#fff;padding:5px 9px;border-radius:999px;font-size:10px;font-weight:800}.cleanCompareHandle{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;background:#fff;color:#182536;display:flex;align-items:center;justify-content:center;font-weight:900;box-shadow:0 4px 16px rgba(0,0,0,.35);pointer-events:none}.cleanCompareRange{width:100%;margin-top:8px}.cleanToolInfo{font-size:10px;color:var(--muted);line-height:1.45;margin-top:7px}.cleanApplyRow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.cleanStrength{display:grid;grid-template-columns:1fr 1fr;gap:8px}.cleanStrength label{margin:0}.cleanTag{font-size:9px;background:rgba(255,255,255,.08);border:1px solid var(--line);padding:3px 6px;border-radius:999px;color:var(--muted)}
+@media(max-width:720px){.cleanCompare{height:210px}}
+@media(max-width:430px){.cleanToolbar,.cleanApplyRow,.cleanStrength{grid-template-columns:1fr}.cleanCompare{height:190px}}
+
+/* ===== Video-style visual drag crop add-on — keeps the existing crop controls ===== */
+#canvasWrap{touch-action:none}
+.cropOverlay{position:absolute;inset:0;display:none;z-index:20;pointer-events:none}
+.cropOverlay.active{display:block;pointer-events:auto}
+.cropShade{position:absolute;inset:0;background:rgba(0,0,0,.42);pointer-events:none}
+.cropSelection{position:absolute;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.9),0 0 0 9999px rgba(0,0,0,.02);touch-action:none;cursor:move}
+.cropSelection:before,.cropSelection:after{content:"";position:absolute;inset:0;pointer-events:none}
+.cropSelection:before{background:linear-gradient(to right,transparent 33.15%,rgba(255,255,255,.6) 33.2%,rgba(255,255,255,.6) 33.55%,transparent 33.6%,transparent 66.4%,rgba(255,255,255,.6) 66.45%,rgba(255,255,255,.6) 66.8%,transparent 66.85%),linear-gradient(to bottom,transparent 33.15%,rgba(255,255,255,.6) 33.2%,rgba(255,255,255,.6) 33.55%,transparent 33.6%,transparent 66.4%,rgba(255,255,255,.6) 66.45%,rgba(255,255,255,.6) 66.8%,transparent 66.85%)}
+.cropCenterDot{position:absolute;left:50%;top:50%;width:8px;height:8px;margin:-4px;border-radius:50%;background:#fff;border:1px solid #111;box-shadow:0 1px 4px rgba(0,0,0,.55);pointer-events:none}
+.cropHandle{position:absolute;width:13px;height:13px;background:#fff;border:2px solid #111;border-radius:2px;box-shadow:0 1px 4px rgba(0,0,0,.55);z-index:3}
+.cropHandle.nw{left:-7px;top:-7px;cursor:nwse-resize}.cropHandle.n{left:50%;top:-7px;margin-left:-7px;cursor:ns-resize}.cropHandle.ne{right:-7px;top:-7px;cursor:nesw-resize}
+.cropHandle.e{right:-7px;top:50%;margin-top:-7px;cursor:ew-resize}.cropHandle.se{right:-7px;bottom:-7px;cursor:nwse-resize}.cropHandle.s{left:50%;bottom:-7px;margin-left:-7px;cursor:ns-resize}
+.cropHandle.sw{left:-7px;bottom:-7px;cursor:nesw-resize}.cropHandle.w{left:-7px;top:50%;margin-top:-7px;cursor:ew-resize}
+.cropInfo{position:absolute;left:50%;top:-39px;transform:translateX(-50%);background:rgba(0,0,0,.82);color:#fff;padding:5px 9px;border-radius:6px;font-size:11px;font-weight:800;white-space:nowrap;pointer-events:none}
+.cropToolbar{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.cropToolbar .btn{font-size:11px}.cropToolbar .btn.active{outline:2px solid rgba(90,169,255,.75);background:linear-gradient(135deg,#1c4770,#14523f);color:#fff}
+.cropHelp{font-size:10px;color:var(--muted);line-height:1.45;margin-top:7px}
+@media(max-width:720px){.cropHandle{width:16px;height:16px}.cropHandle.nw{left:-8px;top:-8px}.cropHandle.n{top:-8px;margin-left:-8px}.cropHandle.ne{right:-8px;top:-8px}.cropHandle.e{right:-8px;margin-top:-8px}.cropHandle.se{right:-8px;bottom:-8px}.cropHandle.s{bottom:-8px;margin-left:-8px}.cropHandle.sw{left:-8px;bottom:-8px}.cropHandle.w{left:-8px;margin-top:-8px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="topbar">
+  <div class="brand">🖼️ ResizeImage.ARnc <small>Advanced Professional Studio • Local-first</small></div>
+  <div class="top-actions">
+    <button class="btn primary" id="openBtn">＋ Add Images</button>
+    <button class="btn" id="undoBtn">↶ Undo</button><button class="btn" id="redoBtn">↷ Redo</button>
+    <button class="btn" id="compareBtn">Before / After</button>
+    <button class="btn" id="saveProjectBtn">Save Project</button><button class="btn" id="loadProjectBtn">Load Project</button>
+    <button class="btn primary" id="exportBtn">Export</button>
+  </div>
+</header>
+
+<div class="layout">
+<aside class="sidebar">
+  <div class="section-title">Workspace</div>
+  <div class="toolnav">
+    <button class="active" data-panel="editor">🎨 Editor</button><button data-panel="clean">🪄 Smart Clean <span class="cleanBadge">PRO</span></button>
+    <button data-panel="adjust">☀️ Adjustments</button>
+    <button data-panel="filters">✨ Filters</button>
+    <button data-panel="crop">✂️ Crop & Transform</button>
+    <button data-panel="text">🔤 Text & Watermark</button>
+    <button data-panel="draw">🖌 Draw & Shapes</button>
+    <button data-panel="background">🧩 Background</button>
+    <button data-panel="theme">🎨 Theme</button>
+    <button data-panel="batch">📦 Batch Workspace</button>
+    <button data-panel="export">💾 Export & Privacy</button>
+    <button data-panel="project">🗂 Project & History</button>
+  </div>
+  <div class="section-title">Quick actions</div>
+  <div class="grid2">
+    <button class="btn small" id="fitBtn">Fit</button><button class="btn small" id="actualBtn">100%</button>
+    <button class="btn small" id="rotateL">↺ Rotate</button><button class="btn small" id="rotateR">↻ Rotate</button>
+    <button class="btn small" id="flipH">↔ Flip</button><button class="btn small" id="flipV">↕ Flip</button>
+  </div>
+  <div class="section-title">Security</div>
+  <div class="notice">Images are processed in this browser. No upload server is required by this studio.</div>
+</aside>
+
+<main class="workspace">
+  <div class="workspace-head">
+    <span class="pill" id="fileCount">0 images</span><span class="pill" id="activeName">No image selected</span>
+    <span class="pill" id="canvasSize">—</span><span class="pill" id="zoomLabel">100%</span>
+    <button class="btn small" id="fullscreenBtn">⛶ Fullscreen</button>
+  </div>
+
+  <div class="canvas-stage" id="stage">
+    <div class="empty" id="emptyState">
+      <h2>Advanced Image Workspace</h2>
+      <p>Open one or many images. Edit non-destructively, compare results, apply the same operations to a batch, then export with your chosen format and quality.</p>
+      <div class="drop" id="dropZone">Drop images here<br><button class="btn primary" id="emptyOpen">Choose Images</button></div>
+    </div>
+    <div class="canvas-wrap hidden" id="canvasWrap"><canvas id="mainCanvas"></canvas><div class="cropOverlay" id="cropOverlay"><div class="cropShade"></div><div class="cropSelection" id="cropSelection"><div class="cropInfo" id="cropInfo">Free</div><div class="cropCenterDot"></div><i class="cropHandle nw" data-handle="nw"></i><i class="cropHandle n" data-handle="n"></i><i class="cropHandle ne" data-handle="ne"></i><i class="cropHandle e" data-handle="e"></i><i class="cropHandle se" data-handle="se"></i><i class="cropHandle s" data-handle="s"></i><i class="cropHandle sw" data-handle="sw"></i><i class="cropHandle w" data-handle="w"></i></div></div></div>
+  </div>
+  <div class="statusbar"><span id="status">Ready</span><span style="margin-left:auto" id="memoryStatus">Local processing</span></div>
+</main>
+
+<aside class="rightbar">
+  <section class="panel active" id="panel-editor">
+    <div class="card"><h3>Image Workspace</h3>
+      <div class="row"><button class="btn small" id="duplicateBtn">Duplicate</button><button class="btn small" id="resetBtn">Reset Image</button><button class="btn small danger" id="removeBtn">Remove</button></div>
+    </div>
+    <div class="card"><h3>Resize</h3>
+      <div class="grid2">
+        <label class="field"><span>Width</span><input id="wInput" type="number" min="1"></label>
+        <label class="field"><span>Height</span><input id="hInput" type="number" min="1"></label>
+      </div>
+      <label class="check"><input id="lockRatio" type="checkbox" checked> Keep aspect ratio</label>
+      <button class="btn primary" id="resizeBtn">Apply Resize</button>
+    </div>
+    <div class="card"><h3>Advanced Resize</h3>
+      <div class="grid2">
+        <label class="field"><span>Percent</span><input id="resizePercent" type="number" min="1" max="1000" value="100"></label>
+        <button class="btn small" id="applyPercentResize">Apply %</button>
+      </div>
+      <div class="grid2">
+        <label class="field"><span>Target MP</span><input id="resizeMP" type="number" min="0.05" max="100" step="0.05" value="2"></label>
+        <button class="btn small" id="applyMPResize">Resize to MP</button>
+      </div>
+      <div class="grid2">
+        <label class="field"><span>Max Width</span><input id="maxResizeW" type="number" min="1" value="1920"></label>
+        <label class="field"><span>Max Height</span><input id="maxResizeH" type="number" min="1" value="1080"></label>
+      </div>
+      <button class="btn small" id="fitMaxResize">Fit Inside Max Size</button>
+      <div class="grid2">
+        <label class="field"><span>Long Edge</span><input id="longEdgeResize" type="number" min="1" value="2048"></label>
+        <button class="btn small" id="applyLongEdgeResize">Set Long Edge</button>
+      </div>
+      <div class="grid2">
+        <label class="field"><span>Resampling</span><select id="resizeQuality"><option value="high" selected>High Quality</option><option value="medium">Balanced</option><option value="low">Fast</option></select></label>
+        <button class="btn small" id="smartResizeBtn">⚡ Smart Resize</button>
+      </div>
+      <div class="row"><button class="btn small" id="upscale2xBtn">2× Upscale</button><button class="btn small" id="downscale50Btn">50% Downscale</button></div>
+    </div>
+    <div class="card"><h3>Resize Modes</h3>
+      <label class="field"><span>Mode</span><select id="resizeMode">
+        <option value="width">By Width</option>
+        <option value="height">By Height</option>
+        <option value="percent">By Percentage</option>
+        <option value="longest">Longest Side</option>
+        <option value="shortest">Shortest Side</option>
+        <option value="fit">Fit Inside Box</option>
+        <option value="fill">Fill Box + Crop</option>
+        <option value="stretch">Exact / Stretch</option>
+      </select></label>
+      <div class="grid2">
+        <label class="field"><span>Target Width</span><input id="modeResizeW" type="number" min="1" value="1280"></label>
+        <label class="field"><span>Target Height</span><input id="modeResizeH" type="number" min="1" value="720"></label>
+      </div>
+      <label class="field"><span>Scale % <b id="modeResizePercentV">100%</b></span><input id="modeResizePercent" type="range" min="1" max="400" value="100"></label>
+      <label class="check"><input id="noUpscaleResize" type="checkbox"> Do not upscale beyond original size</label>
+      <div class="row"><button class="btn primary" id="applyResizeMode">Apply Resize Mode</button><button class="btn small" id="resetResizeMode">Use Original Size</button></div>
+      <p class="muted">Fit keeps the complete image. Fill covers the target box and crops the overflow. Stretch forces exact dimensions.</p>
+    </div>
+    <div class="card"><h3>Resize Output</h3>
+      <div class="grid2">
+        <label class="field"><span>Format</span><select id="resizeOutputFormat"><option value="image/jpeg">JPG / JPEG</option><option value="image/png">PNG</option><option value="image/webp">WEBP</option></select></label>
+        <label class="field"><span>Quality</span><input id="resizeOutputQuality" type="number" min="10" max="100" value="92"></label>
+      </div>
+      <button class="btn small" id="applyResizeOutput">Link to Export Settings</button>
+      <p class="muted">This links resize export format and quality to the existing Professional Export controls.</p>
+    </div>
+    <div class="card"><h3>Print Size</h3>
+      <div class="grid2">
+        <label class="field"><span>Width</span><input id="printW" type="number" min="0.01" step="0.01" value="6"></label>
+        <label class="field"><span>Height</span><input id="printH" type="number" min="0.01" step="0.01" value="4"></label>
+      </div>
+      <div class="grid2">
+        <label class="field"><span>Unit</span><select id="printUnit"><option value="in" selected>Inch</option><option value="cm">CM</option></select></label>
+        <label class="field"><span>DPI</span><select id="printDpi"><option>72</option><option selected>150</option><option>200</option><option>300</option><option>600</option></select></label>
+      </div>
+      <button class="btn primary" id="applyPrintResize">Resize for Print</button>
+    </div>
+    <div class="card"><h3>Smart presets</h3>
+      <div class="grid2">
+        <button class="btn small preset" data-size="1080x1080">Square 1080</button>
+        <button class="btn small preset" data-size="1080x1350">Post 4:5</button>
+        <button class="btn small preset" data-size="1920x1080">16:9 HD</button>
+        <button class="btn small preset" data-size="1080x1920">Story 9:16</button>
+        <button class="btn small preset" data-size="600x600">Passport 600</button>
+        <button class="btn small preset" data-size="1280x720">YouTube</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-adjust">
+    <div class="card"><h3>Professional Adjustments</h3>
+      <label class="field"><span>Brightness <b id="brightnessV">0</b></span><input data-adjust="brightness" id="brightness" type="range" min="-100" max="100" value="0"></label>
+      <label class="field"><span>Contrast <b id="contrastV">0</b></span><input data-adjust="contrast" id="contrast" type="range" min="-100" max="100" value="0"></label>
+      <label class="field"><span>Saturation <b id="saturationV">0</b></span><input data-adjust="saturation" id="saturation" type="range" min="-100" max="100" value="0"></label>
+      <label class="field"><span>Exposure <b id="exposureV">0</b></span><input data-adjust="exposure" id="exposure" type="range" min="-100" max="100" value="0"></label>
+      <label class="field"><span>Warmth <b id="warmthV">0</b></span><input data-adjust="warmth" id="warmth" type="range" min="-100" max="100" value="0"></label>
+      <label class="field"><span>Blur <b id="blurV">0</b></span><input data-adjust="blur" id="blur" type="range" min="0" max="20" value="0"></label>
+      <button class="btn small" id="resetAdjust">Reset Adjustments</button>
+    </div>
+    <div class="card"><h3>Detail</h3>
+      <label class="field"><span>Sharpness <b id="sharpV">0</b></span><input id="sharpness" type="range" min="0" max="100" value="0"></label>
+      <label class="field"><span>Vignette <b id="vignetteV">0</b></span><input id="vignette" type="range" min="0" max="100" value="0"></label>
+      <button class="btn primary" id="applyDetail">Apply Detail</button>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-filters">
+    <div class="card"><h3>One-click Looks</h3><div class="grid2">
+      <button class="btn small filter" data-filter="normal">Original</button><button class="btn small filter" data-filter="grayscale">Grayscale</button>
+      <button class="btn small filter" data-filter="sepia">Sepia</button><button class="btn small filter" data-filter="vintage">Vintage</button>
+      <button class="btn small filter" data-filter="cool">Cool</button><button class="btn small filter" data-filter="warm">Warm</button>
+      <button class="btn small filter" data-filter="dramatic">Dramatic</button><button class="btn small filter" data-filter="mono">Mono</button>
+    </div></div>
+    <div class="card"><h3>Custom Color</h3>
+      <label class="field"><span>Hue</span><input id="hue" type="range" min="-180" max="180" value="0"></label>
+      <label class="field"><span>Opacity</span><input id="opacity" type="range" min="0" max="100" value="100"></label>
+      <button class="btn small" id="applyColor">Apply Color Grade</button>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-crop">
+    <div class="card"><h3>Crop & Transform</h3>
+      <div class="grid2"><button class="btn small cropPreset" data-r="1">1:1</button><button class="btn small cropPreset" data-r="1.25">5:4</button><button class="btn small cropPreset" data-r="1.7778">16:9</button><button class="btn small cropPreset" data-r=".5625">9:16</button></div>
+      <div class="cropToolbar"><button class="btn small" id="visualCropBtn">🖱️ Drag Crop</button><button class="btn small" id="cropFreeBtn">Free</button><button class="btn small" id="cropSquareBtn">1:1</button><button class="btn small" id="crop45Btn">4:5</button><button class="btn small" id="crop169Btn">16:9</button><button class="btn small" id="crop916Btn">9:16</button></div>
+      <div class="cropToolbar"><button class="btn small" id="cropResetSelection">↺ Reset Selection</button><button class="btn primary small" id="applyVisualCrop">✂️ Apply Drag Crop</button><button class="btn small" id="cancelVisualCrop">Cancel</button></div>
+      <div class="cropHelp">Video-style crop: drag inside the image to move the selection, drag any corner/edge to resize it. The existing X/Y/W/H crop method above remains available.</div>
+      <div class="grid2" style="margin-top:8px"><label class="field"><span>Crop X</span><input id="cropX" type="number" min="0" value="0"></label><label class="field"><span>Crop Y</span><input id="cropY" type="number" min="0" value="0"></label><label class="field"><span>Crop W</span><input id="cropW" type="number" min="1" value="100"></label><label class="field"><span>Crop H</span><input id="cropH" type="number" min="1" value="100"></label></div>
+      <button class="btn primary" id="applyCrop">Apply Crop</button>
+      <div class="row" style="margin-top:8px"><button class="btn small" id="straightenL">−1°</button><button class="btn small" id="straightenR">+1°</button><button class="btn small" id="perspectiveInfo">Perspective</button></div>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-text">
+    <div class="card"><h3>Text & Watermark</h3>
+      <label class="field"><span>Text</span><input id="textValue" type="text" placeholder="Your text / watermark"></label>
+      <div class="grid2"><label class="field"><span>Size</span><input id="textSize" type="number" min="8" max="300" value="48"></label><label class="field"><span>Color</span><input id="textColor" type="color" value="#ffffff"></label></div>
+      <label class="field"><span>Opacity</span><input id="textOpacity" type="range" min="5" max="100" value="80"></label>
+      <div class="grid2"><button class="btn small" id="addTextCenter">Add Center</button><button class="btn small" id="addWatermark">Watermark</button></div>
+      <p class="muted">Text is rasterized into the current image when applied. Undo remains available.</p>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-draw">
+    <div class="card"><h3>Draw & Shapes</h3>
+      <div class="grid2"><label class="field"><span>Brush size</span><input id="brushSize" type="range" min="1" max="80" value="8"></label><label class="field"><span>Color</span><input id="brushColor" type="color" value="#ff3355"></label></div>
+      <div class="grid2"><button class="btn small" id="drawMode">🖌 Brush</button><button class="btn small" id="eraserMode">🧹 Eraser</button><button class="btn small" id="lineMode">╱ Line</button><button class="btn small" id="rectMode">□ Rectangle</button><button class="btn small" id="circleMode">○ Circle</button><button class="btn small" id="clearMarks">Clear Marks</button></div>
+      <p class="muted">Choose a tool, then draw directly on the image. Drawing is committed to the canvas and can be undone.</p>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-background">
+    <div class="card"><h3>Background</h3>
+      <label class="field"><span>Solid color</span><input id="bgColor" type="color" value="#ffffff"></label>
+      <div class="grid2"><button class="btn small" id="fillBg">Fill Background</button><button class="btn small" id="transparentBg">Transparent</button></div>
+      <label class="field" style="margin-top:9px"><span>Border size</span><input id="borderSize" type="range" min="0" max="80" value="0"></label>
+      <button class="btn small" id="applyBorder">Apply Border</button>
+      <div class="notice">Fill Background replaces the connected background color found from the image corners. Transparent removes that detected background. Best results are with plain or uniform backgrounds.</div>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-theme">
+    <div class="card"><h3>🎨 Theme</h3>
+      <div class="grid2">
+        <button class="btn small themeBtn" data-theme="dark">🌙 Dark</button>
+        <button class="btn small themeBtn" data-theme="light">☀️ Light</button>
+        <button class="btn small themeBtn" data-theme="green">🌿 Green</button>
+        <button class="btn small themeBtn" data-theme="purple">💜 Purple</button>
+        <button class="btn small themeBtn" data-theme="ocean">🌊 Ocean</button>
+        <button class="btn small themeBtn" data-theme="sunset">🌅 Sunset</button>
+      </div>
+      <div class="notice" style="margin-top:9px">Theme changes only the visual color scheme. Existing editor tools, image data and layout remain unchanged.</div>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-clean">
+    <div class="card cleanHero"><h3>🪄 Remini-style Smart Clean <span class="cleanBadge">LOCAL</span></h3>
+      <div class="muted">One-click browser enhancement for blur/noise/low-light images. No backend or image upload is required.</div>
+      <div class="cleanActions" style="margin-top:10px">
+        <button class="btn primary" id="smartCleanBtn">✨ Smart Clean</button>
+        <button class="btn" id="cleanRestoreBtn">↩ Restore Original</button>
+      </div>
+      <div class="cleanProgress" id="cleanProgress"><i id="cleanProgressBar"></i></div>
+      <div class="cleanResult" id="cleanStatus">Upload an image and press Smart Clean.</div>
+    </div>
+    <div class="card"><h3>🧰 AI Toolbar <span class="cleanTag">Screenshot-style tools</span></h3>
+      <div class="cleanToolbar">
+        <button class="btn cleanToolBtn" id="cleanFaceBtn"><b>👤 Face Enhance</b><small>Detail recovery for the main subject area</small></button>
+        <button class="btn cleanToolBtn" id="cleanBgEnhanceBtn"><b>🏞️ Background Enhance</b><small>Improve surrounding tones and clarity</small></button>
+        <button class="btn cleanToolBtn" id="cleanBgBlurBtn"><b>🌫️ Background Blur</b><small>Soft portrait-style background separation</small></button>
+        <button class="btn cleanToolBtn" id="cleanColorBtn"><b>🎨 Color Correction</b><small>Auto exposure, contrast and color balance</small></button>
+      </div>
+      <div class="cleanToolInfo">These controls run locally in your browser. Face/background separation is an image-processing approximation unless your browser provides a compatible face/segmentation model.</div>
+      <div class="cleanApplyRow"><button class="btn primary" id="cleanApplyToolsBtn">✓ Apply Selected Tools</button><button class="btn" id="cleanClearToolsBtn">Clear Tools</button></div>
+    </div>
+    <div class="card"><h3>🎚️ Clean Strength</h3>
+      <label class="field"><span>Denoise <b id="cleanDenoiseV">35</b></span><input id="cleanDenoise" type="range" min="0" max="100" value="35"></label>
+      <label class="field"><span>Detail / Sharpen <b id="cleanSharpV">45</b></span><input id="cleanSharp" type="range" min="0" max="100" value="45"></label>
+      <label class="field"><span>Clarity <b id="cleanClarityV">30</b></span><input id="cleanClarity" type="range" min="0" max="100" value="30"></label>
+      <label class="field"><span>Light Recovery <b id="cleanLightV">20</b></span><input id="cleanLight" type="range" min="0" max="100" value="20"></label>
+      <label class="cleanToggle"><input id="cleanAutoColor" type="checkbox" checked> Auto color / white-balance correction</label>
+      <label class="cleanToggle"><input id="cleanFaceSafe" type="checkbox" checked> Face-safe detail mode (conservative sharpening)</label>
+    </div>
+    <div class="card"><h3>🧠 Advanced Clean Controls <span class="cleanTag">Local</span></h3>
+      <label class="field"><span>Face Detail <b id="cleanFaceDetailV">45</b></span><input id="cleanFaceDetail" type="range" min="0" max="100" value="45"></label>
+      <label class="field"><span>Background Depth <b id="cleanBgDepthV">35</b></span><input id="cleanBgDepth" type="range" min="0" max="100" value="35"></label>
+      <label class="field"><span>Dehaze / Haze Removal <b id="cleanDehazeV">15</b></span><input id="cleanDehaze" type="range" min="0" max="100" value="15"></label>
+      <label class="field"><span>Texture Recovery <b id="cleanTextureV">25</b></span><input id="cleanTexture" type="range" min="0" max="100" value="25"></label>
+      <label class="field"><span>JPEG Artifact Cleanup <b id="cleanArtifactV">20</b></span><input id="cleanArtifact" type="range" min="0" max="100" value="20"></label>
+      <div class="cleanGrid" style="margin-top:8px">
+        <button class="btn small" id="cleanAutoOptimizeBtn">🪄 Auto Optimize</button>
+        <button class="btn small" id="cleanPreviewToolsBtn">👁️ Preview Selected</button>
+      </div>
+      <div class="cleanResult" id="cleanAdvancedStatus">These controls use local pixel processing and do not upload the image.</div>
+    </div>
+    <div class="card"><h3>⚡ One-click Presets</h3>
+      <div class="cleanGrid3">
+        <button class="btn small cleanPreset" data-mode="portrait">👤 Portrait</button>
+        <button class="btn small cleanPreset" data-mode="lowlight">🌙 Low Light</button>
+        <button class="btn small cleanPreset" data-mode="oldphoto">🖼️ Old Photo</button>
+        <button class="btn small cleanPreset" data-mode="document">📄 Document</button>
+        <button class="btn small cleanPreset" data-mode="color">🌈 Color Boost</button>
+        <button class="btn small cleanPreset" data-mode="sharp">🔎 Extra Detail</button>
+      </div>
+    </div>
+    <div class="card"><h3>🔬 Quality & Upscale</h3>
+      <div class="cleanGrid">
+        <button class="btn small" id="qualityScanBtn">🔎 Quality Scan</button>
+        <select id="cleanScale"><option value="1">Keep size</option><option value="2">2× Upscale</option><option value="4">4× Upscale</option></select>
+      </div>
+      <button class="btn small" id="cleanUpscaleBtn" style="margin-top:8px">⬆️ Upscale + Detail Recovery</button>
+      <div class="cleanResult" id="qualityScanResult">Quality scan will report resolution, brightness, contrast and estimated noise.</div>
+    </div>
+    <div class="card"><h3>🖼️ Before / After <span class="cleanTag">Drag slider</span></h3>
+      <div class="cleanCompare" id="cleanCompare">
+        <canvas id="cleanCompareBefore"></canvas>
+        <div class="cleanAfterLayer" id="cleanAfterLayer"><canvas id="cleanCompareAfter"></canvas></div>
+        <div class="cleanCompareLabels"><span>Before</span><span>After</span></div>
+        <div class="cleanCompareHandle" id="cleanCompareHandle">↔</div>
+      </div>
+      <input class="cleanCompareRange" id="cleanCompareRange" type="range" min="0" max="100" value="50" aria-label="Before and after comparison">
+      <div class="cleanPreview"><div><canvas id="cleanBeforeCanvas"></canvas><div class="cleanMini">Original</div></div><div><canvas id="cleanAfterCanvas"></canvas><div class="cleanMini">Cleaned</div></div></div>
+      <div class="cleanNote">This is a local “Remini-style” enhancement, not the proprietary Remini neural model. It improves the pixels available in the source image; it cannot reliably recreate missing facial or object details.</div>
+    </div>
+  </section>
+  <section class="panel" id="panel-batch">
+    <div class="card"><h3>Batch Workspace</h3>
+      <p class="muted">The same resize, format and quality settings can be exported to all loaded images.</p>
+      <div class="thumb-list" id="thumbList"></div>
+      <div class="grid2" style="margin-top:8px"><label class="field"><span>Output format</span><select id="batchFormat"><option value="image/jpeg">JPG</option><option value="image/png">PNG</option><option value="image/webp">WEBP</option></select></label><label class="field"><span>Quality</span><input id="batchQuality" type="range" min="10" max="100" value="92"></label></div>
+      <button class="btn primary" id="batchExport">Export All</button>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-export">
+    <div class="card"><h3>Professional Export</h3>
+      <label class="field"><span>Format</span><select id="exportFormat"><option value="image/jpeg">JPG / JPEG</option><option value="image/png">PNG</option><option value="image/webp">WEBP</option></select></label>
+      <label class="field"><span>Quality <b id="qualityV">92%</b></span><input id="quality" type="range" min="10" max="100" value="92"></label>
+      <label class="check"><input id="stripMeta" type="checkbox" checked> Privacy export — canvas output strips original EXIF by default</label>
+      <label class="check"><input id="includeDate" type="checkbox"> Add export timestamp to filename</label>
+      <button class="btn primary" id="downloadCurrent">Download Current</button>
+      <div class="notice" style="margin-top:9px">Canvas-based export intentionally does not preserve original EXIF/GPS metadata. This is a privacy-oriented local export behavior.</div>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-project">
+    <div class="card"><h3>History</h3><div class="history" id="history"></div></div>
+    <div class="card"><h3>Workspace actions</h3><div class="grid2"><button class="btn small" id="clearHistory">Clear History</button><button class="btn small" id="newWorkspace">New Workspace</button></div></div>
+  </section>
+</aside>
+</div>
+</div>
+
+<input id="fileInput" type="file" accept="image/*" multiple hidden>
+<div class="modal" id="compareModal"><div class="modal-box"><div class="row"><h2 style="margin:0">Before / After</h2><button class="btn small" style="margin-left:auto" id="closeCompare">Close</button></div><div class="compare" style="margin-top:14px"><div><div class="muted">Original</div><img id="beforeImg" alt="Original"></div><div><div class="muted">Processed</div><img id="afterImg" alt="Processed"></div></div></div></div>
+<div class="toast" id="toast"></div>
+
+  <footer class="siteFooter" id="siteFooter">
+  <section class="footerAbout">
+    <h2>About this website</h2>
+    <p>this website is a browser-based photo editing workspace designed to bring useful image editing functions together in one focused and easy-to-understand interface. The editor is built around a central canvas where an uploaded photograph can be viewed and edited, while the surrounding toolbar, side tools and adjustment panel provide access to the main controls. The purpose of this website is to make common image-editing work practical for everyday users without requiring a separate desktop application for basic tasks. Users can open an image from their device, choose an image through the upload area, drag and drop a photograph into the editor, or paste an image from the clipboard when supported by the browser. After an image is loaded, the existing workspace provides controls for light, color and detail adjustments, including brightness, exposure, contrast, highlights, shadows, vignette, saturation, temperature, tint, blur and sharpness. These controls are designed to provide direct visual adjustment while the image remains inside the editor canvas.</p>
+    <p>The Crop area provides free cropping as well as common fixed ratios such as square, four-by-three and sixteen-by-nine. Straightening is also available for correcting the visual angle of a photograph. The editor includes transformation controls for rotating the image to the left or right and for flipping the image horizontally or vertically. The Resize area supports pixel dimensions, percentage-based resizing and centimeter-based sizing, with an option to keep the image aspect ratio. These tools are useful when an image needs to be prepared for a particular screen, document, website, social platform or other destination that requires a specific size.</p>
+    <p>this website also contains creative controls for changing the visual appearance of photographs. Preset filters include Original, Vivid, B&amp;W, Sepia, Cool, Warm, Matte and Dramatic. Additional creative effects include Invert, Posterize, Pixelate and Duotone. These features are intended to let users experiment with different looks without leaving the editor. The Text tool allows a user to enter text, select a font, change the font size and choose a text color before placing the text on the image. Text can then be moved directly on the canvas. The Draw area provides a brush and eraser workflow, with controls for brush color and brush size, allowing users to add marks or remove drawn areas as part of the editing process.</p>
+    <p>Background tools are another important part of the editor. The current interface includes an AI-powered background-removal workflow that loads the browser background-removal model when required, processes the image and creates a transparent foreground result. A processing overlay communicates that the background-removal operation is in progress. After removal, the transparent result can be used with the background replacement controls. A solid background color can be selected, or a background image can be chosen from the device and applied behind the foreground. This makes the background section useful for product images, portraits, creative compositions and other situations where the original background needs to be removed or replaced.</p>
+    <p>The editor also includes project and output functionality. Users can save a project using the existing Save control and later open an ARnc project file to restore the editing state. The project structure can retain image information, text elements, rotation, flips, selected filters, adjustment values and background color information. The Export control allows the edited image to be produced as PNG, JPG or WEBP. The editor also includes undo and redo history so that changes can be reversed or restored during an editing session. Zoom controls make it possible to enlarge or reduce the canvas view, while Fit adjusts the image to the available workspace. Current image dimensions are shown in the footer status area.</p>
+    <p>this website is designed with responsive use in mind. On smaller screens, the interface changes its layout so the tool area can occupy a dedicated portion of the available space while the central image workspace remains accessible. In landscape mobile use, the editor can retain a side-by-side working arrangement with the tool panel positioned over the available side area when opened. The goal is to keep the existing editor controls usable across desktop, portrait mobile and landscape mobile orientations rather than removing important functions simply because the screen is smaller. The footer feature boxes below summarize the major capabilities of the website and are interactive: clicking a feature opens its longer explanation, and clicking it again returns the box to its compact form.</p>
+    <p>this website is intended as a practical, local-first style editing workspace where many everyday image operations can be performed directly in the browser. Depending on the feature and browser environment, processing can use the device itself, including canvas-based image operations and the browser-loaded background-removal model. Users should keep a copy of important original photographs before performing major edits, especially when preparing images for professional or archival purposes. The editor provides a convenient working environment, but the final output should always be checked at its intended size and format before publishing, printing or submitting it to another service.</p>
+    <p>The interface is organized so that the main editor remains the focus. The compact footer continues to display zoom, status and dimensions, while the expanded feature-information area is placed within the footer and does not replace the existing editing tools. Each feature is placed in its own box to make the available functionality easier to understand. The boxes are independent, so opening one explanation does not require changing the behavior of another feature box. This keeps the information area organized even when several features are listed together. The longer descriptions are available on demand, which helps keep the default footer compact while still providing detailed information for users who want to learn what the website can do.</p>
+    <p>Overall, this website brings together image opening, canvas preview, adjustments, cropping, straightening, filters, creative effects, text, drawing, background removal, background replacement, resizing, transformations, project saving, project restoration, exporting, undo and redo, zoom and responsive editing in a single browser-based workspace. The feature information at the bottom of the website is intended to explain these capabilities in long-form language without changing the core editor workflow. Existing buttons, controls, canvas behavior and the visual structure of the editor remain the primary working interface, while the new footer information provides an additional reference for visitors who want a fuller understanding of the available features.</p>
+
+    <h2>Privacy Policy – Image Workspace.ARnc </h2>
+    <p>Privacy Policy – Image Workspace.ARnc
+
+Welcome to Image Workspace.ARnc (“we,” “us,” “our,” or “the Website”). Your privacy is important to us. This Privacy Policy explains how information may be collected, used, processed, stored, and protected when you visit or use Image Workspace.ARnc.
+
+Image Workspace.ARnc is an online photo editing and image-processing platform designed to provide users with tools for editing, resizing, cropping, compressing, enhancing, converting, and processing images.
+
+By accessing or using Image Workspace.ARnc, you acknowledge that you have read and understood this Privacy Policy. If you do not agree with this Privacy Policy, please discontinue use of the Website.
+
+---
+
+1. About This Privacy Policy
+
+This Privacy Policy explains:
+
+- What information may be collected from users
+- How uploaded images may be processed
+- How personal information may be used
+- How cookies and similar technologies may be used
+- How analytics information may be collected
+- How account and sign-in information may be handled
+- How third-party services may process information
+- How information may be protected
+- How long information may be retained
+- How privacy-related questions can be submitted
+
+Our goal is to provide clear information about how data may be handled while you use Image Workspace.ARnc.
+
+---
+
+2. Using Image Workspace.ARnc
+
+Image Workspace.ARnc provides online image-processing and photo-editing tools. Depending on the features available on the Website, users may be able to upload images and perform different operations.
+
+These features may include:
+
+- Image resizing
+- Image cropping
+- Image compression
+- Image format conversion
+- Image quality adjustment
+- Brightness adjustment
+- Image rotation
+- Photo enhancement
+- Background-related tools
+- Image editing
+- Image downloading
+- Other image-processing features
+
+Features may be added, modified, removed, or updated over time.
+
+---
+
+3. Information We May Collect
+
+Depending on how you use the Website, Image Workspace.ARnc may collect information directly from you or automatically through your browser or device.
+
+The type of information collected may vary depending on the features you use.
+
+Information may include:
+
+- Name
+- Email address
+- Account information
+- Sign-in information
+- User preferences
+- Device information
+- Browser information
+- Website usage information
+- Technical information
+- Uploaded files or images, where required for a requested service
+
+We aim to collect only information that is reasonably necessary for providing, maintaining, securing, and improving the Website and its services.
+
+---
+
+4. Uploaded Images and Files
+
+Image Workspace.ARnc allows users to upload images for certain editing and processing functions.
+
+For example, you may upload a photograph to:
+
+- Resize the image
+- Crop the image
+- Compress the image
+- Convert the image into another format
+- Adjust image quality
+- Change brightness or other settings
+- Enhance the image
+- Perform other editing operations
+
+The image may be processed locally within your browser or may be transmitted to a server when a particular feature requires server-side processing.
+
+Our intention is to process uploaded images for the purpose requested by the user.
+
+Users should avoid uploading highly confidential, sensitive, or private images unless they understand how the specific feature processes uploaded files.
+
+---
+
+5. Local and Server-Side Processing
+
+Some Image Workspace.ARnc features may process images directly within your browser or on your device. When processing occurs locally, the image may not need to be uploaded to a remote server for that particular operation.
+
+Other advanced features may require server-side processing.
+
+When server-side processing is required, an uploaded image may temporarily pass through or be stored within the processing infrastructure necessary to complete the requested operation.
+
+Temporary files may be deleted after processing where technically practical. However, we cannot guarantee immediate or permanent deletion in every situation because of technical systems, backups, logs, caching, or third-party infrastructure.
+
+---
+
+6. Personal Information
+
+Certain features may require users to provide personal information.
+
+This may include information such as:
+
+- Name
+- Email address
+- Account details
+- Authentication information
+- Information voluntarily submitted through contact forms
+
+Personal information may be used to provide requested services, manage accounts, improve security, communicate with users when necessary, and maintain the Website.
+
+We do not intend to collect unnecessary personal information.
+
+---
+
+7. Account and Sign-In Information
+
+If Image Workspace.ARnc provides account registration or sign-in functionality, users may be required to provide certain information to create or access an account.
+
+Account-related information may be used for:
+
+- User authentication
+- Account management
+- Sign-in functionality
+- Account security
+- Password recovery
+- Access to account-specific features
+- Prevention of unauthorized access
+
+Users are responsible for keeping their account credentials confidential.
+
+You should not share your password with other people. If you believe that someone has gained unauthorized access to your account, you should take appropriate steps to secure the account and contact us where applicable.
+
+---
+
+8. Automatically Collected Technical Information
+
+When you visit Image Workspace.ARnc, certain technical information may be automatically collected by the Website, hosting provider, analytics services, security services, or other technical infrastructure.
+
+This information may include:
+
+- IP address
+- Browser type
+- Operating system
+- Device type
+- Screen information
+- Approximate usage information
+- Pages visited
+- Date and time of access
+- Referring website
+- Technical errors
+- General website interaction information
+
+This information may be used to operate, maintain, secure, analyze, and improve the Website.
+
+---
+
+9. Cookies
+
+Image Workspace.ARnc may use cookies and similar technologies.
+
+Cookies are small pieces of information that websites may store in your browser.
+
+Cookies may be used for purposes such as:
+
+- Website functionality
+- Session management
+- Sign-in functionality
+- User preferences
+- Security
+- Analytics
+- Performance monitoring
+
+You may control or disable cookies through your browser settings.
+
+However, disabling certain cookies may cause some Website features to function incorrectly or become unavailable.
+
+---
+
+10. Analytics
+
+Image Workspace.ARnc may use analytics services, such as Google Analytics, to understand how users interact with the Website.
+
+Analytics information may help us understand:
+
+- Website visits
+- Page views
+- Feature usage
+- Button interactions
+- General user behavior
+- Device and browser information
+- Traffic sources
+- Website performance
+
+This information can help us identify technical problems, understand which features are useful, and improve the overall user experience.
+
+Third-party analytics providers may have their own privacy policies and data-processing practices.
+
+---
+
+11. Click and Event Tracking
+
+The Website may use event or interaction tracking to understand how users interact with different features.
+
+For example, tracking may record interactions with:
+
+- Upload buttons
+- Editing tools
+- Download buttons
+- Conversion tools
+- Navigation controls
+- Other Website features
+
+This type of information may be used to understand general Website usage and improve features.
+
+Where possible, analytics information should be interpreted as usage information rather than as a record of the actual contents of your private images.
+
+---
+
+12. How We May Use Information
+
+Information collected through Image workspace.ARnc may be used for purposes including:
+
+1. Providing Website functionality.
+2. Processing images requested by users.
+3. Providing editing and conversion services.
+4. Managing user accounts.
+5. Providing sign-in and authentication functionality.
+6. Improving Website performance.
+7. Detecting and resolving technical problems.
+8. Protecting the Website against abuse and unauthorized activity.
+9. Understanding Website usage through analytics.
+10. Improving user experience.
+11. Maintaining Website security.
+12. Complying with applicable legal requirements.
+
+We aim to use information only for legitimate and relevant purposes connected with operating and improving the Website.
+
+---
+
+13. Sharing of Information
+
+We do not intend to sell users' personal information.
+
+Information may, however, be processed by third-party service providers when their services are necessary to operate the Website.
+
+Depending on the Website's technical architecture, these providers may include:
+
+- Hosting providers
+- Cloud infrastructure providers
+- Analytics providers
+- Authentication providers
+- Image-processing services
+- Security providers
+- Technical service providers
+
+Third-party providers may process information according to their own privacy policies and applicable contractual or legal requirements.
+
+---
+
+14. Legal Disclosure
+
+Information may be disclosed where required or permitted by applicable law.
+
+For example, information may be disclosed when necessary to:
+
+- Comply with a legal obligation
+- Respond to a valid legal request
+- Comply with a court order
+- Investigate fraud or abuse
+- Protect Website security
+- Protect users or other individuals
+- Protect legal rights
+
+We will seek to limit disclosures to what is reasonably necessary under the applicable circumstances.
+
+---
+
+15. Data Security
+
+We take reasonable technical and organizational measures designed to protect information handled through Image Workspace.ARnc.
+
+Security measures may include appropriate access controls, secure communication technologies, authentication protections, and other safeguards depending on the Website's infrastructure.
+
+However, no internet-based service, electronic transmission, or storage system can be guaranteed to be completely secure.
+
+Therefore, while we work to protect information, we cannot guarantee absolute security.
+
+---
+
+16. Data Retention
+
+Information may be retained for as long as reasonably necessary for the purposes described in this Privacy Policy, including:
+
+- Providing services
+- Maintaining accounts
+- Maintaining security
+- Troubleshooting
+- Analytics
+- Legal compliance
+- Maintaining technical records
+
+The retention period for uploaded images may depend on the specific feature and whether processing occurs locally or on a server.
+
+Temporary image files may be removed after processing where technically practical.
+
+However, copies may potentially remain for a limited period in backups, logs, caches, or other technical systems.
+
+---
+
+17. User Responsibilities
+
+Users are responsible for the information and files they upload to Image workspace.ARnc
+
+You should:
+
+- Only upload images that you have the right to process.
+- Avoid uploading another person's private information without permission.
+- Protect your account credentials.
+- Avoid uploading extremely sensitive files unless necessary.
+- Use the Website in accordance with applicable laws.
+- Notify us of suspected security issues when appropriate.
+
+Image workspace.ARnc is not responsible for determining whether a user has the legal right to upload or process a particular image.
+
+---
+
+18. Children's Privacy
+
+Image workspace.ARnc does not intentionally seek to collect personal information from children in violation of applicable law.
+
+If a parent or legal guardian believes that a child has provided personal information to the Website without appropriate authorization, they may contact us using the available contact method.
+
+Where legally required and technically possible, appropriate steps may be taken to address such information.
+
+---
+
+19. Third-Party Websites and Links
+
+Image workspace.ARnc may contain links to external websites, services, or resources.
+
+When you visit an external website, that website's own privacy policy may apply.
+
+We do not control the privacy practices, security, policies, or content of third-party websites.
+
+Users should review the privacy policy of any external service before providing personal information or using that service.
+
+---
+
+20. Advertising
+
+If advertisements are displayed on Image Workspace.ARnc, advertising providers may use cookies, pixels, or similar technologies in accordance with their applicable policies.
+
+Advertising-related technologies may be used for purposes such as:
+
+- Delivering advertisements
+- Measuring advertising performance
+- Understanding advertising interactions
+- Personalizing advertisements where permitted
+
+Advertising providers may have their own privacy policies and user controls.
+
+---
+
+21. Changes to Website Features
+
+Image workspace.ARnc may introduce new tools and features in the future.
+
+These may include new image-editing tools, conversion services, account features, analytics systems, or other technologies.
+
+The way certain information is processed may therefore change as the Website develops.
+
+Where appropriate, this Privacy Policy may be updated to reflect significant changes.
+
+---
+
+22. Changes to This Privacy Policy
+
+We may update or revise this Privacy Policy from time to time.
+
+When changes are made, the updated policy may be published on this page.
+
+The “Last Updated” date at the beginning of this Privacy Policy indicates when the policy was most recently revised.
+
+Users are encouraged to review this page periodically.
+
+---
+
+23. Your Privacy Choices
+
+Depending on applicable law and the features available on the Website, you may have certain choices regarding your personal information.
+
+These may include choices related to:
+
+- Cookies
+- Analytics
+- Account information
+- Communication preferences
+- Personal information submitted through contact forms
+
+Some choices may be controlled through your browser, device, account settings, or third-party service settings.
+
+Where applicable law provides additional privacy rights, users may contact us to request information about exercising those rights.
+
+---
+
+24. Sensitive Images and Personal Documents
+
+Image workspace.ARnc may allow users to process photographs and documents.
+
+Users should exercise particular caution when uploading:
+
+- Government identity documents
+- Financial documents
+- Private family photographs
+- Confidential business documents
+- Personal identification information
+- Other highly sensitive content
+
+Before uploading sensitive material, users should understand whether the specific tool performs processing locally or through a server-based service.
+
+No online service can guarantee zero risk, so users should consider the sensitivity of an image before uploading it.
+
+---
+
+25. Contact Us
+
+If you have questions, concerns, or requests regarding this Privacy Policy or the handling of information by Image Workspace.ARnc, please use the official Contact Us method provided on the Website.
+
+Website Name: Image workspace.ARnc
+
+Privacy Contact: Use the official contact method available on the Image Workspace.ARnc Website.
+
+---
+
+26. Important Privacy Notice
+
+Different tools on Image workspace.ARnc may use different technical processing methods.
+
+Some tools may process images directly in your browser, while other tools may require server-side or third-party processing.
+
+Because of these differences, users should review the relevant information provided with a particular feature before uploading highly confidential or sensitive content.
+
+We take reasonable steps to protect information and provide a privacy-conscious service, but we cannot guarantee that internet-based services will always be completely secure or that every temporary copy of data will be immediately removed.
+
+---
+
+27. Final Statement
+
+Image workspace.ARnc respects the privacy of its users and aims to handle information responsibly.
+
+Our goal is to use information primarily for providing requested image-processing services, operating the Website, maintaining security, understanding Website usage, and improving the overall service.
+
+By using Image Workspace.ARnc, you acknowledge that you have read and understood this Privacy Policy.
+
+If you do not agree with the practices described here, please discontinue using the Website.
+
+We recommend reviewing this Privacy Policy periodically because our Website, features, technologies, and services may change over time.
+
+____
+
+Contact us:
+Website: Image workspace.ARnc
+Privacy / Support Email: subham99209114@gmail.com
+Contact no: 7544095688
+
+© 2026 Image workspace.ARnc All Rights Reserved. </p>
+ </section> 
+</footer>
+
+
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const state = {
+  images:[], active:0, zoom:1, history:[], redo:[],
+  adjust:{brightness:0,contrast:0,saturation:0,exposure:0,warmth:0,blur:0},
+  filter:'normal', hue:0, colorOpacity:100, sharpness:0,vignette:0, rotation:0, flipX:1, flipY:1,
+  drawMode:null, drawing:false, start:null, last:null, originalData:null, cropMode:false, cropRatio:null, cropRect:{x:.1,y:.1,w:.8,h:.8}, cropDrag:null
+};
+const canvas=$('mainCanvas'), ctx=canvas.getContext('2d',{willReadFrequently:true});
+function toast(s){$('toast').textContent=s;$('toast').classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>$('toast').classList.remove('show'),2300)}
+function status(s){$('status').textContent=s}
+function fmtBytes(n){if(!n)return '0 B';let u=['B','KB','MB','GB'],i=0;while(n>1024&&i<3){n/=1024;i++}return n.toFixed(i?1:0)+' '+u[i]}
+function active(){return state.images[state.active]||null}
+function pushHistory(label){
+  const snap=canvas.toDataURL('image/png');
+  state.history.push({label,snap}); if(state.history.length>40)state.history.shift(); state.redo=[];
+  renderHistory();
+}
+function renderHistory(){ $('history').innerHTML=state.history.slice().reverse().map((h,i)=>`<div>${state.history.length-i}. ${h.label}</div>`).join('')||'<div>No edits yet</div>'}
+function updateUI(){
+  const im=active(); $('fileCount').textContent=`${state.images.length} image${state.images.length===1?'':'s'}`;
+  $('activeName').textContent=im?im.name:'No image selected';
+  $('canvasSize').textContent=im?`${canvas.width} × ${canvas.height}`:'—';
+  $('zoomLabel').textContent=Math.round(state.zoom*100)+'%';
+  $('emptyState').classList.toggle('hidden',!!im); $('canvasWrap').classList.toggle('hidden',!im);
+  if(im){$('wInput').value=canvas.width;$('hInput').value=canvas.height}
+  renderThumbs();
+  if(state.cropMode) requestAnimationFrame(syncCropOverlay);
+}
+function renderThumbs(){
+  $('thumbList').innerHTML=state.images.map((im,i)=>`<div class="thumb ${i===state.active?'active':''}" data-i="${i}">
+    <img src="${im.src}" alt=""><div><div class="thumb-name">${escapeHtml(im.name)}</div><div class="thumb-meta">${im.w}×${im.h} • ${fmtBytes(im.size)}</div></div>
+    <button class="btn small danger" data-remove="${i}">×</button></div>`).join('');
+  $('thumbList').querySelectorAll('.thumb').forEach(x=>x.onclick=e=>{if(e.target.dataset.remove)return;selectImage(+x.dataset.i)});
+  $('thumbList').querySelectorAll('[data-remove]').forEach(b=>b.onclick=e=>{e.stopPropagation();removeImage(+b.dataset.remove)});
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function loadFile(file){
+  return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>resolve({name:file.name,size:file.size,w:im.naturalWidth,h:im.naturalHeight,src:r.result,img:im,original:r.result});im.onerror=reject;im.src=r.result};r.onerror=reject;r.readAsDataURL(file)})
+}
+async function addFiles(files){
+  status('Loading images…'); const list=[];
+  for(const f of files){if(!f.type.startsWith('image/'))continue;try{list.push(await loadFile(f))}catch{}}
+  state.images.push(...list); if(state.images.length && state.active>=state.images.length)state.active=state.images.length-1;
+  if(list.length)selectImage(state.images.length-list.length); else updateUI(); status(`${list.length} image(s) added`);
+}
+function selectImage(i){
+  if(!state.images[i])return; state.active=i; state.adjust={brightness:0,contrast:0,saturation:0,exposure:0,warmth:0,blur:0};state.filter='normal';state.hue=0;state.colorOpacity=100;state.sharpness=0;state.vignette=0;state.rotation=0;state.flipX=1;state.flipY=1;
+  const im=state.images[i].img; canvas.width=im.naturalWidth;canvas.height=im.naturalHeight;ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(im,0,0);
+  state.originalData=canvas.toDataURL('image/png');state.history=[{label:'Original',snap:state.originalData}];state.redo=[];state.cropMode=false;state.cropDrag=null;state.cropRatio=null;if($('cropOverlay'))$('cropOverlay').classList.remove('active');if($('visualCropBtn'))$('visualCropBtn').classList.remove('active');renderHistory();syncControls();updateUI();status('Image ready');
+}
+function syncControls(){
+  for(const k of ['brightness','contrast','saturation','exposure','warmth','blur']){$(k).value=state.adjust[k];$(k+'V').textContent=state.adjust[k]}
+  $('sharpness').value=state.sharpness;$('sharpV').textContent=state.sharpness;$('vignette').value=state.vignette;$('vignetteV').textContent=state.vignette;$('hue').value=state.hue;$('opacity').value=state.colorOpacity;
+}
+function renderFromSource(){
+  const im=active();if(!im)return;
+  const sw=im.img.naturalWidth,sh=im.img.naturalHeight;
+  const rad=state.rotation*Math.PI/180, c=Math.abs(Math.cos(rad)), si=Math.abs(Math.sin(rad));
+  const temp=document.createElement('canvas'),t=temp.getContext('2d',{willReadFrequently:true});
+  temp.width=Math.max(1,Math.ceil(sw*c+sh*si));
+  temp.height=Math.max(1,Math.ceil(sw*si+sh*c));
+  t.save();t.translate(temp.width/2,temp.height/2);t.rotate(rad);t.scale(state.flipX,state.flipY);
+  const brightness=state.adjust.brightness, contrast=state.adjust.contrast, sat=state.adjust.saturation;
+  const exposure=state.adjust.exposure;
+  let f=`brightness(${Math.max(0,100+brightness+exposure*.75)}%) contrast(${Math.max(0,100+contrast)}%) saturate(${Math.max(0,100+sat)}%)`;
+  if(state.adjust.blur)f+=` blur(${state.adjust.blur}px)`;
+  if(state.hue && state.colorOpacity>0)f+=` hue-rotate(${state.hue*(state.colorOpacity/100)}deg)`;
+  if(state.filter==='grayscale')f+=' grayscale(100%)';
+  if(state.filter==='sepia')f+=' sepia(85%)';
+  if(state.filter==='vintage')f+=' sepia(35%) contrast(112%) saturate(82%)';
+  if(state.filter==='cool')f+=' hue-rotate(170deg) saturate(108%)';
+  if(state.filter==='warm')f+=' sepia(22%) saturate(125%)';
+  if(state.filter==='dramatic')f+=' contrast(135%) saturate(118%)';
+  if(state.filter==='mono')f+=' grayscale(100%) contrast(125%)';
+  t.filter=f;t.drawImage(im.img,-sw/2,-sh/2,sw,sh);t.restore();
+  canvas.width=temp.width;canvas.height=temp.height;ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(temp,0,0);
+  if(state.vignette){const g=ctx.createRadialGradient(canvas.width/2,canvas.height/2,Math.min(canvas.width,canvas.height)*.25,canvas.width/2,canvas.height/2,Math.max(canvas.width,canvas.height)*.72);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,`rgba(0,0,0,${state.vignette/140})`);ctx.fillStyle=g;ctx.fillRect(0,0,canvas.width,canvas.height)}
+  if(state.adjust.warmth){ctx.save();ctx.globalCompositeOperation='soft-light';ctx.fillStyle=state.adjust.warmth>0?`rgba(255,130,50,${Math.abs(state.adjust.warmth)/500})`:`rgba(40,130,255,${Math.abs(state.adjust.warmth)/500})`;ctx.fillRect(0,0,canvas.width,canvas.height);ctx.restore()}
+  updateUI();
+}
+function applyTransform(label){if(!active())return;pushHistory('Before '+label);renderFromSource();commitCanvas(label);status(label+' applied')}
+function commitCanvas(label){
+  const index=state.active, target=state.images[index]; if(!target)return;
+  const data=canvas.toDataURL('image/png');target.src=data;
+  const im=new Image();im.onload=()=>{if(!state.images[index])return;state.images[index].img=im;state.images[index].w=im.naturalWidth;state.images[index].h=im.naturalHeight;state.images[index].original=state.images[index].original||data;if(state.active===index)updateUI()};im.src=data;
+  pushHistory(label);
+}
+function undo(){
+  if(state.history.length<2){toast('Nothing to undo');return}
+  const current=state.history.pop();state.redo.push(current);const prev=state.history[state.history.length-1];
+  const im=new Image();im.onload=()=>{canvas.width=im.width;canvas.height=im.height;ctx.drawImage(im,0,0);syncImageFromCanvas();updateUI();status('Undo')};im.src=prev.snap;
+}
+function redo(){
+  const h=state.redo.pop();if(!h){toast('Nothing to redo');return}
+  state.history.push(h);const im=new Image();im.onload=()=>{canvas.width=im.width;canvas.height=im.height;ctx.drawImage(im,0,0);syncImageFromCanvas();updateUI();status('Redo')};im.src=h.snap;
+}
+function syncImageFromCanvas(){
+  const index=state.active; const target=state.images[index]; if(!target)return;
+  const data=canvas.toDataURL('image/png'), im=new Image();
+  im.onload=()=>{if(!state.images[index])return;state.images[index].img=im;state.images[index].src=data;state.images[index].w=im.width;state.images[index].h=im.height;if(state.active===index)updateUI()};
+  im.src=data;
+}
+function downloadCanvas(name, type, quality){
+  canvas.toBlob(blob=>{if(!blob){toast('Export failed');return}const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)},type,quality)
+}
+function exportCurrent(){
+  const im=active();if(!im){toast('Add an image first');return}
+  const type=$('exportFormat').value,q=+$('quality').value/100,ext=type==='image/png'?'png':type==='image/webp'?'webp':'jpg';
+  let base=im.name.replace(/\.[^.]+$/,'')||'image';if($('includeDate').checked)base+='_'+new Date().toISOString().replace(/[:.]/g,'-');
+  downloadCanvas(base+'.'+ext,type,q);status('Export complete')
+}
+function crop(x,y,w,h){
+  const sx=Math.max(0,Math.min(canvas.width-1,x)),sy=Math.max(0,Math.min(canvas.height-1,y));
+  const sw=Math.max(1,Math.min(canvas.width-sx,w)),sh=Math.max(1,Math.min(canvas.height-sy,h));
+  const temp=document.createElement('canvas');temp.width=sw;temp.height=sh;temp.getContext('2d').drawImage(canvas,sx,sy,sw,sh,0,0,sw,sh);
+  canvas.width=sw;canvas.height=sh;ctx.drawImage(temp,0,0);syncImageFromCanvas();pushHistory('Crop')
+}
+function cropRatioLabel(){return state.cropRatio?((Math.round(state.cropRatio*1000)/1000)+' : 1'):'Free'}
+function cropRectToPixels(){const r=state.cropRect;return {x:r.x*canvas.width,y:r.y*canvas.height,w:r.w*canvas.width,h:r.h*canvas.height}}
+function clampCropRect(r){r.x=Math.max(0,Math.min(1-r.w,r.x));r.y=Math.max(0,Math.min(1-r.h,r.y));r.w=Math.max(.01,Math.min(1,r.w));r.h=Math.max(.01,Math.min(1,r.h));return r}
+function syncCropOverlay(){
+  const ov=$('cropOverlay'),sel=$('cropSelection'); if(!ov||!sel)return;
+  if(!state.cropMode){ov.classList.remove('active');return}
+  ov.classList.add('active'); const r=state.cropRect;
+  sel.style.left=(r.x*100)+'%';sel.style.top=(r.y*100)+'%';sel.style.width=(r.w*100)+'%';sel.style.height=(r.h*100)+'%';
+  const px=cropRectToPixels(); $('cropInfo').textContent=(state.cropRatio?cropRatioLabel()+' • ':'')+Math.round(px.w)+' × '+Math.round(px.h);
+}
+function setCropRatio(ratio){state.cropRatio=ratio;document.querySelectorAll('#cropFreeBtn,#cropSquareBtn,#crop45Btn,#crop169Btn,#crop916Btn').forEach(b=>b.classList.remove('active'));const map={free:'cropFreeBtn',1:'cropSquareBtn',.8:'crop45Btn','1.7777777777777777':'crop169Btn','0.5625':'crop916Btn'};const id=map[ratio===null?'free':String(ratio)];if(id&&$(id))$(id).classList.add('active');
+  if(state.cropMode){let r=state.cropRect;const cx=r.x+r.w/2,cy=r.y+r.h/2;let w=r.w,h=r.h;if(ratio){h=w/ratio;if(h>1){h=1;w=h*ratio}if(w>1){w=1;h=w/ratio}r={x:cx-w/2,y:cy-h/2,w,h};state.cropRect=clampCropRect(r);syncCropOverlay()}}
+}
+function resetCropSelection(){const ratio=state.cropRatio;let w=.8,h=.8;if(ratio){h=w/ratio;if(h>1){h=.8;w=h*ratio}if(w>1){w=.8;h=w/ratio}}state.cropRect=clampCropRect({x:(1-w)/2,y:(1-h)/2,w,h});syncCropOverlay()}
+function cropPointerPoint(e){const r=$('canvasWrap').getBoundingClientRect();return {x:Math.max(0,Math.min(1,(e.clientX-r.left)/r.width)),y:Math.max(0,Math.min(1,(e.clientY-r.top)/r.height))}}
+function beginVisualCrop(e){if(!state.cropMode||!active())return;e.preventDefault();const handle=e.target.closest('.cropHandle');const p=cropPointerPoint(e);const r={...state.cropRect};state.cropDrag={type:handle?handle.dataset.handle:'move',start:p,rect:r};e.target.setPointerCapture?.(e.pointerId)}
+function moveVisualCrop(e){const d=state.cropDrag;if(!d)return;e.preventDefault();const p=cropPointerPoint(e),dx=p.x-d.start.x,dy=p.y-d.start.y,min=.01;let r={...d.rect};
+  if(d.type==='move'){r.x=Math.max(0,Math.min(1-r.w,d.rect.x+dx));r.y=Math.max(0,Math.min(1-r.h,d.rect.y+dy))}
+  else {let left=d.rect.x,top=d.rect.y,right=d.rect.x+d.rect.w,bottom=d.rect.y+d.rect.h;const t=d.type;if(t.includes('w'))left=Math.max(0,Math.min(right-min,d.rect.x+dx));if(t.includes('e'))right=Math.min(1,Math.max(left+min,d.rect.x+d.rect.w+dx));if(t.includes('n'))top=Math.max(0,Math.min(bottom-min,d.rect.y+dy));if(t.includes('s'))bottom=Math.min(1,Math.max(top+min,d.rect.y+d.rect.h+dy));
+    if(state.cropRatio){const ar=state.cropRatio;let w=right-left,h=bottom-top;if(t.includes('e')||t.includes('w'))h=w/ar;else w=h*ar;
+      if(t.includes('w'))left=right-w;else if(t.includes('e'))right=left+w;else if(t.includes('n'))top=bottom-h;else bottom=top+h;
+      if(left<0){w=right;left=0;h=w/ar;if(t.includes('n'))top=bottom-h;else bottom=top+h} if(right>1){w=1-left;right=1;h=w/ar;if(t.includes('n'))top=bottom-h;else bottom=top+h} if(top<0){h=bottom;top=0;w=h*ar;if(t.includes('w'))left=right-w;else right=left+w} if(bottom>1){h=1-top;bottom=1;w=h*ar;if(t.includes('w'))left=right-w;else right=left+w}
+    } r={x:left,y:top,w:right-left,h:bottom-top};r=clampCropRect(r)}
+  state.cropRect=r;syncCropOverlay()
+}
+function endVisualCrop(){state.cropDrag=null}
+function openVisualCrop(){if(!active()){toast('Add an image first');return}state.cropMode=true;state.drawMode=null;resetCropSelection();$('visualCropBtn').classList.add('active');status('Drag crop mode — move or resize the selection');syncCropOverlay()}
+function closeVisualCrop(){state.cropMode=false;state.cropDrag=null;$('cropOverlay').classList.remove('active');$('visualCropBtn').classList.remove('active')}
+function applyVisualCrop(){if(!active()||!state.cropMode){toast('Open Drag Crop first');return}const p=cropRectToPixels();crop(Math.round(p.x),Math.round(p.y),Math.round(p.w),Math.round(p.h));closeVisualCrop();status('Drag crop applied');toast('Crop applied')}
+$('visualCropBtn').onclick=openVisualCrop;$('cropFreeBtn').onclick=()=>setCropRatio(null);$('cropSquareBtn').onclick=()=>setCropRatio(1);$('crop45Btn').onclick=()=>setCropRatio(.8);$('crop169Btn').onclick=()=>setCropRatio(16/9);$('crop916Btn').onclick=()=>setCropRatio(9/16);$('cropResetSelection').onclick=resetCropSelection;$('applyVisualCrop').onclick=applyVisualCrop;$('cancelVisualCrop').onclick=closeVisualCrop;
+$('cropOverlay').addEventListener('pointerdown',beginVisualCrop);$('cropOverlay').addEventListener('pointermove',moveVisualCrop);$('cropOverlay').addEventListener('pointerup',endVisualCrop);$('cropOverlay').addEventListener('pointercancel',endVisualCrop);
+function addText(text,x,y,size,color,opacity){
+  if(!active()||!text){toast('Enter text first');return}pushHistory('Before text');
+  ctx.save();ctx.globalAlpha=opacity;ctx.fillStyle=color;ctx.font=`700 ${size}px Arial`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.shadowColor='rgba(0,0,0,.45)';ctx.shadowBlur=Math.max(2,size/10);ctx.fillText(text,x,y);ctx.restore();syncImageFromCanvas();pushHistory('Text / watermark')
+}
+function applyBorder(){
+  const b=+$('borderSize').value;if(!b)return;pushHistory('Before border');
+  const temp=document.createElement('canvas');temp.width=canvas.width+2*b;temp.height=canvas.height+2*b;const t=temp.getContext('2d');t.fillStyle='#fff';t.fillRect(0,0,temp.width,temp.height);t.drawImage(canvas,b,b);
+  canvas.width=temp.width;canvas.height=temp.height;ctx.drawImage(temp,0,0);syncImageFromCanvas();pushHistory('Border')
+}
+function setBg(color,transparent=false){
+  if(!active()){toast('Add an image first');return}
+  pushHistory('Before background');
+  const w=canvas.width,h=canvas.height;
+  if(!w||!h){toast('Invalid image size');return}
+  const img=ctx.getImageData(0,0,w,h),d=img.data;
+  const visited=new Uint8Array(w*h),queue=[];
+  const tol=30,tol2=tol*tol;
+  const seeds=[[0,0],[w-1,0],[0,h-1],[w-1,h-1]];
+  const colors=seeds.map(([x,y])=>{const i=(y*w+x)*4;return [d[i],d[i+1],d[i+2]]});
+  const dist=(i,c)=>{const dr=d[i]-c[0],dg=d[i+1]-c[1],db=d[i+2]-c[2];return dr*dr+dg*dg+db*db};
+  const isBg=(i)=>colors.some(c=>dist(i,c)<=tol2);
+  const add=(p)=>{if(!visited[p]){visited[p]=1;queue.push(p)}};
+  // Start only from the actual outer border. This prevents similarly-colored
+  // areas inside the subject from being recolored unless they are connected
+  // to the detected background.
+  for(let x=0;x<w;x++){add(x);add((h-1)*w+x)}
+  for(let y=0;y<h;y++){add(y*w);add(y*w+w-1)}
+  const hex=color||'#ffffff',m=/^#?([0-9a-f]{6})$/i.exec(hex);
+  let rr=255,gg=255,bb=255;
+  if(m){const n=parseInt(m[1],16);rr=(n>>16)&255;gg=(n>>8)&255;bb=n&255}
+  let changed=0;
+  while(queue.length){
+    const p=queue.shift(),x=p%w,y=(p/w)|0,i=p*4;
+    if(!isBg(i))continue;
+    if(transparent){if(d[i+3]!==0){d[i+3]=0;changed++}}
+    else if(d[i]!==rr||d[i+1]!==gg||d[i+2]!==bb){d[i]=rr;d[i+1]=gg;d[i+2]=bb;changed++}
+    if(x>0)add(p-1);if(x<w-1)add(p+1);if(y>0)add(p-w);if(y<h-1)add(p+w)
+  }
+  ctx.putImageData(img,0,0);syncImageFromCanvas();
+  pushHistory(transparent?'Transparent background':'Background color');
+  status(changed?(transparent?'Background removed without recoloring subject':'Background changed without recoloring subject'):'Background not detected — use an image with a clear background');
+  toast(changed?(transparent?'Background removed':'Background changed'):'Background not detected');
+}
+function clearMarks(){if(!active()){toast('Add an image first');return}const last=state.history[state.history.length-1];if(last&&last.label==='Drawing'){undo();toast('Latest drawing removed')}else{toast('No latest drawing to clear — use Undo for the previous edit')}}
+function drawPointer(e){
+  if(!state.drawing||!state.drawMode)return;const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*(canvas.width/r.width),y=(e.clientY-r.top)*(canvas.height/r.height);
+  ctx.save();ctx.lineWidth=+$('brushSize').value;ctx.lineCap='round';ctx.lineJoin='round';
+  if(state.drawMode==='eraser'){ctx.globalCompositeOperation='destination-out';ctx.strokeStyle='rgba(0,0,0,1)'}else{ctx.globalCompositeOperation='source-over';ctx.strokeStyle=$('brushColor').value}
+  if(state.drawMode==='brush'||state.drawMode==='eraser'){ctx.beginPath();ctx.moveTo(state.last.x,state.last.y);ctx.lineTo(x,y);ctx.stroke()}
+  else {ctx.restore();renderFromSource();ctx.save();ctx.strokeStyle=$('brushColor').value;ctx.lineWidth=+$('brushSize').value;ctx.beginPath();if(state.drawMode==='line'){ctx.moveTo(state.start.x,state.start.y);ctx.lineTo(x,y)}else if(state.drawMode==='rect'){ctx.rect(state.start.x,state.start.y,x-state.start.x,y-state.start.y)}else{const rr=Math.hypot(x-state.start.x,y-state.start.y);ctx.arc(state.start.x,state.start.y,rr,0,Math.PI*2)}ctx.stroke()}
+  ctx.restore();state.last={x,y}
+}
+function startDraw(e){if(state.cropMode)return;if(!state.drawMode||!active())return;state.drawing=true;const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*(canvas.width/r.width),y=(e.clientY-r.top)*(canvas.height/r.height);state.start=state.last={x,y};pushHistory('Before drawing')}
+function endDraw(){if(!state.drawing)return;state.drawing=false;syncImageFromCanvas();pushHistory('Drawing')}
+function saveProject(){
+  if(!active()){toast('Add an image first');return}
+  const project={version:1,name:'ResizeImage.ARnc Advanced Project',active:state.active,images:state.images.map(x=>({name:x.name,src:x.src,size:x.size,w:x.w,h:x.h,original:x.original}))};
+  const blob=new Blob([JSON.stringify(project)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ResizeImage_ARnc_Project.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500);toast('Project saved')
+}
+async function loadProject(file){
+  try{const p=JSON.parse(await file.text());state.images=[];for(const x of p.images||[]){const im=new Image();im.src=x.src;await new Promise(r=>im.onload=r);state.images.push({...x,img:im})}state.active=Math.min(p.active||0,state.images.length-1);if(state.images.length)selectImage(state.active);toast('Project loaded')}catch{toast('Invalid project file')}
+}
+function removeImage(i){state.images.splice(i,1);if(state.active>=state.images.length)state.active=Math.max(0,state.images.length-1);if(state.images.length)selectImage(state.active);else{state.active=0;updateUI()}}
+function duplicate(){const im=active();if(!im)return;state.images.splice(state.active+1,0,{...im,name:im.name.replace(/(\.[^.]+)?$/,'_copy$1')});selectImage(state.active+1)}
+function resetImage(){
+  const im=active();if(!im)return;
+  const original=im.original||im.src;
+  const img=new Image();img.onload=()=>{im.img=img;im.src=original;im.w=img.naturalWidth;im.h=img.naturalHeight;state.rotation=0;state.flipX=1;state.flipY=1;state.adjust={brightness:0,contrast:0,saturation:0,exposure:0,warmth:0,blur:0};state.filter='normal';state.hue=0;state.colorOpacity=100;state.sharpness=0;state.vignette=0;canvas.width=img.naturalWidth;canvas.height=img.naturalHeight;ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(img,0,0);state.originalData=canvas.toDataURL('image/png');state.history=[{label:'Original',snap:state.originalData}];state.redo=[];state.cropMode=false;state.cropDrag=null;if($('cropOverlay'))$('cropOverlay').classList.remove('active');if($('visualCropBtn'))$('visualCropBtn').classList.remove('active');syncControls();renderHistory();updateUI();toast('Image reset to original')};img.src=original;
+}
+function resizeImage(w,h){w=Math.max(1,Math.round(w));h=Math.max(1,Math.round(h));const temp=document.createElement('canvas');temp.width=w;temp.height=h;const tc=temp.getContext('2d');tc.imageSmoothingEnabled=true;tc.imageSmoothingQuality=$('resizeQuality')?$('resizeQuality').value:'high';tc.drawImage(canvas,0,0,w,h);canvas.width=w;canvas.height=h;ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(temp,0,0);syncImageFromCanvas();pushHistory('Resize '+w+'×'+h);updateUI()}
+function activatePanel(name){document.querySelectorAll('.toolnav button').forEach(b=>b.classList.toggle('active',b.dataset.panel===name));document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id==='panel-'+name))}
+document.querySelectorAll('.toolnav button').forEach(b=>b.onclick=()=>activatePanel(b.dataset.panel));
+$('openBtn').onclick=$('emptyOpen').onclick=()=>$('fileInput').click();
+$('fileInput').onchange=e=>addFiles([...e.target.files]);
+$('dropZone').ondragover=e=>{e.preventDefault();$('dropZone').style.borderColor='#38d39f'};
+$('dropZone').ondragleave=()=>$('dropZone').style.borderColor='';
+$('dropZone').ondrop=e=>{e.preventDefault();$('dropZone').style.borderColor='';addFiles([...e.dataTransfer.files])};
+document.addEventListener('dragover',e=>e.preventDefault());document.addEventListener('drop',e=>{if(e.target===$('dropZone'))return;e.preventDefault()});
+$('undoBtn').onclick=undo;$('redoBtn').onclick=redo;$('duplicateBtn').onclick=duplicate;$('removeBtn').onclick=()=>active()&&removeImage(state.active);$('resetBtn').onclick=resetImage;
+$('rotateL').onclick=()=>{state.rotation=(state.rotation-90+360)%360;applyTransform('Rotate left')};
+$('rotateR').onclick=()=>{state.rotation=(state.rotation+90)%360;applyTransform('Rotate right')};
+$('flipH').onclick=()=>{state.flipX*=-1;applyTransform('Flip horizontal')};$('flipV').onclick=()=>{state.flipY*=-1;applyTransform('Flip vertical')};
+document.querySelectorAll('[data-adjust]').forEach(el=>el.oninput=()=>{state.adjust[el.dataset.adjust]=+el.value;$(el.id+'V').textContent=el.value;renderFromSource()});
+$('resetAdjust').onclick=()=>{state.adjust={brightness:0,contrast:0,saturation:0,exposure:0,warmth:0,blur:0};state.hue=0;state.colorOpacity=100;syncControls();renderFromSource();toast('Adjustments reset')};
+$('sharpness').oninput=e=>{$('sharpV').textContent=e.target.value;state.sharpness=+e.target.value};
+$('vignette').oninput=e=>{$('vignetteV').textContent=e.target.value;state.vignette=+e.target.value;renderFromSource()};
+function applySharpen(amount){
+  if(amount<=0)return;
+  const w=canvas.width,h=canvas.height,src=ctx.getImageData(0,0,w,h),dst=ctx.createImageData(w,h),a=Math.min(1.6,amount/55);
+  const s=src.data,d=dst.data;
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+    const i=(y*w+x)*4;
+    if(x===0||y===0||x===w-1||y===h-1){d[i]=s[i];d[i+1]=s[i+1];d[i+2]=s[i+2];d[i+3]=s[i+3];continue}
+    const l=i-4,r=i+4,u=i-w*4,b=i+w*4;
+    d[i]=Math.max(0,Math.min(255,s[i]*(1+4*a)-a*(s[l]+s[r]+s[u]+s[b])));
+    d[i+1]=Math.max(0,Math.min(255,s[i+1]*(1+4*a)-a*(s[l+1]+s[r+1]+s[u+1]+s[b+1])));
+    d[i+2]=Math.max(0,Math.min(255,s[i+2]*(1+4*a)-a*(s[l+2]+s[r+2]+s[u+2]+s[b+2])));
+    d[i+3]=s[i+3];
+  }
+  ctx.putImageData(dst,0,0);
+}
+$('applyDetail').onclick=()=>{if(!active())return;renderFromSource();applySharpen(state.sharpness);commitCanvas('Detail adjustments');state.sharpness=0;syncControls()};
+document.querySelectorAll('.filter').forEach(b=>b.onclick=()=>{state.filter=b.dataset.filter;renderFromSource();commitCanvas('Filter: '+b.textContent)});
+$('hue').oninput=e=>{state.hue=+e.target.value;renderFromSource()};$('opacity').oninput=e=>{state.colorOpacity=+e.target.value;renderFromSource()};$('applyColor').onclick=()=>{if(!active())return;renderFromSource();commitCanvas('Color grade')};
+document.querySelectorAll('.cropPreset').forEach(b=>b.onclick=()=>{const r=+b.dataset.r;let w=canvas.width,h=Math.round(w/r);if(h>canvas.height){h=canvas.height;w=Math.round(h*r)}$('cropX').value=Math.round((canvas.width-w)/2);$('cropY').value=Math.round((canvas.height-h)/2);$('cropW').value=w;$('cropH').value=h;if(state.cropMode){state.cropRatio=r;state.cropRect={x:(canvas.width-w)/2/canvas.width,y:(canvas.height-h)/2/canvas.height,w:w/canvas.width,h:h/canvas.height};syncCropOverlay();setCropRatio(r)}});
+$('applyCrop').onclick=()=>{crop(+$('cropX').value,+$('cropY').value,+$('cropW').value,+$('cropH').value);if(state.cropMode)closeVisualCrop()};
+$('straightenL').onclick=()=>{state.rotation-=1;renderFromSource();commitCanvas('Straighten -1 degree')};$('straightenR').onclick=()=>{state.rotation+=1;renderFromSource();commitCanvas('Straighten +1 degree')};
+$('addTextCenter').onclick=()=>addText($('textValue').value,canvas.width/2,canvas.height/2,+$('textSize').value,$('textColor').value,+$('textOpacity').value/100);
+$('addWatermark').onclick=()=>addText($('textValue').value||'ResizeImage.ARnc',canvas.width/2,canvas.height-+$('textSize').value,+$('textSize').value,$('textColor').value,+$('textOpacity').value/100);
+document.querySelectorAll('.preset').forEach(b=>b.onclick=()=>{const [w,h]=b.dataset.size.split('x').map(Number);resizeImage(w,h)});
+function applyAdvancedResize(w,h,label){if(!active()){toast('Add an image first');return}if(!Number.isFinite(w)||!Number.isFinite(h)||w<1||h<1){toast('Enter valid resize values');return}resizeImage(w,h);$('wInput').value=Math.round(w);$('hInput').value=Math.round(h);status(label+' applied');toast(label+' applied')}
+$('applyPercentResize').onclick=()=>{const p=+$('resizePercent').value;if(p<=0){toast('Enter a valid percentage');return}applyAdvancedResize(canvas.width*p/100,canvas.height*p/100,p+'% resize')};
+$('applyMPResize').onclick=()=>{const mp=+$('resizeMP').value;if(mp<=0){toast('Enter a valid megapixel value');return}const ratio=canvas.width/canvas.height;const pixels=mp*1000000;applyAdvancedResize(Math.sqrt(pixels*ratio),Math.sqrt(pixels/ratio),'Megapixel resize')};
+$('fitMaxResize').onclick=()=>{const mw=+$('maxResizeW').value,mh=+$('maxResizeH').value;if(mw<=0||mh<=0){toast('Enter valid maximum dimensions');return}const scale=Math.min(mw/canvas.width,mh/canvas.height,1);applyAdvancedResize(canvas.width*scale,canvas.height*scale,'Fit inside max size')};
+$('applyLongEdgeResize').onclick=()=>{const edge=+$('longEdgeResize').value;if(edge<=0){toast('Enter a valid long edge');return}const scale=edge/Math.max(canvas.width,canvas.height);applyAdvancedResize(canvas.width*scale,canvas.height*scale,'Long edge resize')};
+$('smartResizeBtn').onclick=()=>{if(!active()){toast('Add an image first');return}const pixels=canvas.width*canvas.height;const targetMax=8000000;if(pixels>targetMax){const scale=Math.sqrt(targetMax/pixels);applyAdvancedResize(canvas.width*scale,canvas.height*scale,'Smart resize (downscale)')}else{toast('Smart resize: current image is already within the recommended size range')}};
+$('upscale2xBtn').onclick=()=>applyAdvancedResize(canvas.width*2,canvas.height*2,'2× upscale');
+$('downscale50Btn').onclick=()=>applyAdvancedResize(canvas.width*.5,canvas.height*.5,'50% downscale');
+$('applyPrintResize').onclick=()=>{let w=+$('printW').value,h=+$('printH').value,dpi=+$('printDpi').value;if($('printUnit').value==='cm'){w/=2.54;h/=2.54}if(w<=0||h<=0||dpi<=0){toast('Enter valid print size');return}applyAdvancedResize(w*dpi,h*dpi,'Print size resize')};
+function applyResizeMode(mode,w,h,noUpscale){
+  if(!active()){toast('Add an image first');return}
+  w=Math.max(1,Math.round(w)); h=Math.max(1,Math.round(h));
+  const ow=canvas.width,oh=canvas.height;
+  let tw=w,th=h;
+  if(mode==='width'){const sc=w/ow; if(noUpscale&&sc>1){tw=ow;th=oh}else th=oh*sc; resizeImage(tw,th)}
+  else if(mode==='height'){const sc=h/oh; if(noUpscale&&sc>1){tw=ow;th=oh}else tw=ow*sc; resizeImage(tw,th)}
+  else if(mode==='percent'){let sc=w/100; if(noUpscale&&sc>1)sc=1; resizeImage(ow*sc,oh*sc)}
+  else if(mode==='longest'){let sc=w/Math.max(ow,oh); if(noUpscale&&sc>1)sc=1; resizeImage(ow*sc,oh*sc)}
+  else if(mode==='shortest'){let sc=w/Math.min(ow,oh); if(noUpscale&&sc>1)sc=1; resizeImage(ow*sc,oh*sc)}
+  else if(mode==='fit'){let sc=Math.min(w/ow,h/oh); if(noUpscale&&sc>1)sc=1; resizeImage(ow*sc,oh*sc)}
+  else if(mode==='stretch'){if(noUpscale){w=Math.min(w,ow);h=Math.min(h,oh)} resizeImage(w,h)}
+  else if(mode==='fill'){let sc=Math.max(w/ow,h/oh); if(noUpscale&&sc>1)sc=1; const tw=Math.max(1,Math.round(ow*sc)),th=Math.max(1,Math.round(oh*sc)); const temp=document.createElement('canvas');temp.width=w;temp.height=h;const tc=temp.getContext('2d');tc.imageSmoothingEnabled=true;tc.imageSmoothingQuality=$('resizeQuality').value||'high';tc.drawImage(canvas,(w-tw)/2,(h-th)/2,tw,th);canvas.width=w;canvas.height=h;ctx.imageSmoothingEnabled=true;ctx.drawImage(temp,0,0);syncImageFromCanvas();pushHistory('Fill box resize')}
+  $('wInput').value=canvas.width;$('hInput').value=canvas.height;updateUI();status('Resize mode applied');toast('Resize mode applied');
+}
+$('modeResizePercent').oninput=e=>$('modeResizePercentV').textContent=e.target.value+'%';
+$('applyResizeMode').onclick=()=>{const mode=$('resizeMode').value;const no=$('noUpscaleResize').checked;const w=+$('modeResizeW').value,h=+$('modeResizeH').value,p=+$('modeResizePercent').value;if(mode==='percent')applyResizeMode(mode,p,100,no);else if(['width','longest','shortest'].includes(mode))applyResizeMode(mode,w,h,no);else applyResizeMode(mode,w,h,no)};
+$('resetResizeMode').onclick=()=>{if(!active()){toast('Add an image first');return}const o=active().original;const im=new Image();im.onload=()=>{canvas.width=im.naturalWidth||im.width;canvas.height=im.naturalHeight||im.height;ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(im,0,0);syncImageFromCanvas();pushHistory('Restore original dimensions');updateUI();toast('Original dimensions restored')};im.src=o};
+$('resizeOutputFormat').onchange=()=>{if($('exportFormat'))$('exportFormat').value=$('resizeOutputFormat').value};
+$('resizeOutputQuality').oninput=()=>{};
+$('applyResizeOutput').onclick=()=>{if($('exportFormat'))$('exportFormat').value=$('resizeOutputFormat').value;if($('quality')){$('quality').value=$('resizeOutputQuality').value;$('qualityV').textContent=$('resizeOutputQuality').value+'%'}toast('Resize output settings linked')};
+$('resizeBtn').onclick=()=>{let w=+$('wInput').value,h=+$('hInput').value;if($('lockRatio').checked){const ratio=canvas.width/canvas.height;if(document.activeElement===$('wInput'))h=Math.round(w/ratio);else w=Math.round(h*ratio);$('wInput').value=w;$('hInput').value=h}resizeImage(w,h)};
+$('wInput').oninput=()=>{if($('lockRatio').checked)$('hInput').value=Math.max(1,Math.round(+$('wInput').value*canvas.height/canvas.width))};
+$('hInput').oninput=()=>{if($('lockRatio').checked)$('wInput').value=Math.max(1,Math.round(+$('hInput').value*canvas.width/canvas.height))};
+['drawMode','eraserMode','lineMode','rectMode','circleMode'].forEach(id=>$(id).onclick=()=>{state.drawMode={drawMode:'brush',eraserMode:'eraser',lineMode:'line',rectMode:'rect',circleMode:'circle'}[id];toast('Tool: '+state.drawMode)});
+canvas.addEventListener('pointerdown',startDraw);canvas.addEventListener('pointermove',drawPointer);window.addEventListener('pointerup',endDraw);
+$('clearMarks').onclick=clearMarks;$('fillBg').onclick=()=>setBg($('bgColor').value);$('transparentBg').onclick=()=>setBg('',true);$('applyBorder').onclick=applyBorder;
+$('quality').oninput=e=>$('qualityV').textContent=e.target.value+'%';$('downloadCurrent').onclick=exportCurrent;$('exportBtn').onclick=exportCurrent;
+$('compareBtn').onclick=()=>{if(!active()){toast('Add an image first');return}$('beforeImg').src=active().original;$('afterImg').src=canvas.toDataURL('image/png');$('compareModal').classList.add('show')};$('closeCompare').onclick=()=>$('compareModal').classList.remove('show');
+$('saveProjectBtn').onclick=saveProject;$('loadProjectBtn').onclick=()=>{const i=document.createElement('input');i.type='file';i.accept='.json,application/json';i.onchange=()=>i.files[0]&&loadProject(i.files[0]);i.click()};
+$('fullscreenBtn').onclick=async()=>{try{if(document.fullscreenElement){await document.exitFullscreen()}else if($('canvasWrap').requestFullscreen){await $('canvasWrap').requestFullscreen()}else toast('Fullscreen not supported')}catch{toast('Fullscreen is blocked by the browser')}};
+$('fitBtn').onclick=()=>{state.zoom=1;$('mainCanvas').style.width='100%';$('mainCanvas').style.maxWidth='100%';updateUI()};$('actualBtn').onclick=()=>{state.zoom=1;$('mainCanvas').style.width='auto';$('mainCanvas').style.maxWidth='none';updateUI()};
+$('batchExport').onclick=async()=>{
+  if(!state.images.length){toast('Add images first');return}
+  const type=$('batchFormat').value,q=+$('batchQuality').value/100;
+  const previous=state.active;
+  for(let i=0;i<state.images.length;i++){selectImage(i);await new Promise(r=>setTimeout(r,20));await new Promise(resolve=>canvas.toBlob(blob=>{if(!blob){toast('Could not export '+state.images[i].name);resolve();return}const ext=type==='image/png'?'png':type==='image/webp'?'webp':'jpg';const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(state.images[i].name.replace(/\.[^.]+$/,'')||'image')+'_edited.'+ext;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);resolve()},type,q))}
+  if(state.images[previous])selectImage(previous);
+  toast('Batch export complete')
+};
+$('newWorkspace').onclick=()=>{if(confirm('Clear all loaded images?')){state.images=[];state.active=0;state.history=[];state.redo=[];updateUI();renderHistory()}};
+$('clearHistory').onclick=()=>{state.history=[];state.redo=[];renderHistory();toast('History cleared')};
+$('perspectiveInfo').onclick=()=>toast('Perspective grid is reserved for the advanced corner-transform module; this offline build avoids a fake transform');
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();undo()}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y'){e.preventDefault();redo()}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();exportCurrent()}});
+function applyTheme(theme,showToast=true){
+  const allowed=['dark','light','green','purple','ocean','sunset'];
+  if(!allowed.includes(theme))theme='dark';
+  document.body.classList.remove('theme-light','theme-green','theme-purple','theme-ocean','theme-sunset');
+  if(theme!=='dark')document.body.classList.add('theme-'+theme);
+  try{localStorage.setItem('resizeImageARncTheme',theme)}catch(e){}
+  if(showToast)toast('Theme: '+theme);
+}
+document.querySelectorAll('.themeBtn').forEach(b=>b.onclick=()=>applyTheme(b.dataset.theme));
+try{const savedTheme=localStorage.getItem('resizeImageARncTheme');if(savedTheme)applyTheme(savedTheme,false)}catch(e){}
+
+/* ===== Remini-style Smart Clean local engine ===== */
+function cleanSetProgress(v,msg){const p=$('cleanProgress'),b=$('cleanProgressBar');if(p)p.style.display='block';if(b)b.style.width=Math.max(0,Math.min(100,v))+'%';if(msg)$('cleanStatus').textContent=msg;if(v>=100)setTimeout(()=>{if(p)p.style.display='none'},450)}
+function cleanCopyCanvas(src,w,h){const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(src,0,0,w,h);return c}
+function cleanBoxBlur(data,w,h,r){if(r<=0)return data;const out=new Uint8ClampedArray(data.length);const rad=Math.max(1,Math.min(2,Math.round(r)));for(let y=0;y<h;y++)for(let x=0;x<w;x++){let rr=0,gg=0,bb=0,aa=0,n=0;for(let yy=-rad;yy<=rad;yy++){const py=Math.max(0,Math.min(h-1,y+yy));for(let xx=-rad;xx<=rad;xx++){const px=Math.max(0,Math.min(w-1,x+xx));const i=(py*w+px)*4;rr+=data[i];gg+=data[i+1];bb+=data[i+2];aa+=data[i+3];n++}}const j=(y*w+x)*4;out[j]=rr/n;out[j+1]=gg/n;out[j+2]=bb/n;out[j+3]=aa/n}return out}
+function cleanProcessCanvas(srcCanvas,opts){
+  const w=srcCanvas.width,h=srcCanvas.height,c=document.createElement('canvas');c.width=w;c.height=h;
+  const cx=c.getContext('2d',{willReadFrequently:true});cx.drawImage(srcCanvas,0,0);
+  let im=cx.getImageData(0,0,w,h),d=im.data;
+  const original=new Uint8ClampedArray(d), den=(opts.denoise||0)/100, light=(opts.light||0)/100, clarity=(opts.clarity||0)/100;
+  if(den>0){const blur=cleanBoxBlur(original,w,h,den>.55?2:1);for(let i=0;i<d.length;i+=4){const k=den*.72;d[i]=original[i]*(1-k)+blur[i]*k;d[i+1]=original[i+1]*(1-k)+blur[i+1]*k;d[i+2]=original[i+2]*(1-k)+blur[i+2]*k}}
+  let sum=0,count=0;for(let i=0;i<d.length;i+=16){sum+=.2126*d[i]+.7152*d[i+1]+.0722*d[i+2];count++}
+  const avg=sum/count, exposure=(128-avg)/128*light*.42, dehaze=(opts.dehaze||0)/100, texture=(opts.texture||0)/100, artifact=(opts.artifact||0)/100;
+  for(let i=0;i<d.length;i+=4){let r=d[i],g=d[i+1],b=d[i+2];
+    if(light>0){r+=255*exposure;g+=255*exposure;b+=255*exposure}
+    if(opts.autoColor){const cast=(128-(r+g+b)/3)*.045*light;r+=cast;g+=cast*.55;b+=cast*.25}
+    if(clarity>0){const y=.2126*r+.7152*g+.0722*b,boost=(y-128)*clarity*.16;r+=boost;g+=boost;b+=boost}
+    if(dehaze>0){const y=.2126*r+.7152*g+.0722*b, lift=dehaze*(1-y/255)*12, con=1+dehaze*.20;r=(r-128)*con+128+lift;g=(g-128)*con+128+lift;b=(b-128)*con+128+lift}
+    if(texture>0){const y=.2126*r+.7152*g+.0722*b, t=(y-128)*texture*.08;r+=t;g+=t;b+=t}
+    if(opts.color){const y=.2126*r+.7152*g+.0722*b;r=y+(r-y)*(1+opts.color);g=y+(g-y)*(1+opts.color);b=y+(b-y)*(1+opts.color)}
+    d[i]=Math.max(0,Math.min(255,r));d[i+1]=Math.max(0,Math.min(255,g));d[i+2]=Math.max(0,Math.min(255,b));
+  }
+  cx.putImageData(im,0,0);
+  const sharp=Math.min(.95,(opts.sharp||0)/100*.85), protect=opts.faceSafe?Math.max(.2,1-(opts.faceDetail||45)/180):1;
+  if(sharp>0){const frame=cx.getImageData(0,0,w,h),src=frame.data,out=new Uint8ClampedArray(src);for(let y=1;y<h-1;y++)for(let x=1;x<w-1;x++){const i=(y*w+x)*4;for(let ch=0;ch<3;ch++){const edge=4*src[i+ch]-src[i-4+ch]-src[i+4+ch]-src[i-w*4+ch]-src[i+w*4+ch];let strength=sharp*.55;if(opts.faceSafe){const m=cleanRadialMask(x,y,w,h);strength*=m*protect+(1-m)}out[i+ch]=Math.max(0,Math.min(255,src[i+ch]+edge*strength*(1-artifact*.55)))}}frame.data.set(out);cx.putImageData(frame,0,0)}
+  return c;
+}
+function cleanCommitCanvas(result,label){if(!active())return;canvas.width=result.width;canvas.height=result.height;ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(result,0,0);syncImageFromCanvas();pushHistory(label);updateUI();renderHistory();}
+function cleanRun(mode){if(!active()){toast('Add an image first');return}const base=cleanCopyCanvas(canvas,canvas.width,canvas.height);let o={denoise:+$('cleanDenoise').value,sharp:+$('cleanSharp').value,clarity:+$('cleanClarity').value,light:+$('cleanLight').value,autoColor:$('cleanAutoColor').checked,color:0,faceDetail:+$('cleanFaceDetail').value,faceSafe:$('cleanFaceSafe').checked,dehaze:+$('cleanDehaze').value,texture:+$('cleanTexture').value,artifact:+$('cleanArtifact').value};if(mode==='portrait'){o.denoise=28;o.sharp=38;o.clarity=24;o.light=14}else if(mode==='lowlight'){o.denoise=48;o.sharp=42;o.clarity=36;o.light=55}else if(mode==='oldphoto'){o.denoise=52;o.sharp=34;o.clarity=28;o.light=30;o.color=-.06}else if(mode==='document'){o.denoise=20;o.sharp=72;o.clarity=62;o.light=25;o.color=.08}else if(mode==='color'){o.denoise=18;o.sharp=32;o.clarity=38;o.light=12;o.color=.16}else if(mode==='sharp'){o.denoise=12;o.sharp=82;o.clarity=48;o.light=8}cleanSetProgress(15,'Analyzing image…');setTimeout(()=>{cleanSetProgress(45,'Reducing noise…');const out=cleanProcessCanvas(base,o);cleanSetProgress(80,'Recovering detail…');setTimeout(()=>{cleanCommitCanvas(out,'Smart Clean: '+(mode||'Custom'));const bc=$('cleanBeforeCanvas'),ac=$('cleanAfterCanvas');bc.width=Math.min(700,base.width);bc.height=Math.round(base.height*bc.width/base.width);bc.getContext('2d').drawImage(base,0,0,bc.width,bc.height);ac.width=Math.min(700,out.width);ac.height=Math.round(out.height*ac.width/out.width);ac.getContext('2d').drawImage(out,0,0,ac.width,ac.height);cleanShowCompare(base,out);cleanSetProgress(100,'Smart Clean complete — review the result before export.');toast('Smart Clean applied')},80)},60)}
+$('smartCleanBtn').onclick=()=>cleanRun('custom');$('cleanRestoreBtn').onclick=resetImage;document.querySelectorAll('.cleanPreset').forEach(b=>b.onclick=()=>cleanRun(b.dataset.mode));['cleanDenoise','cleanSharp','cleanClarity','cleanLight'].forEach(id=>{$(id).oninput=e=>$(id+'V').textContent=e.target.value});
+$('cleanUpscaleBtn').onclick=()=>{if(!active())return;const scale=+$('cleanScale').value;if(scale===1){cleanRun('sharp');return}const nw=Math.min(8192,Math.round(canvas.width*scale)),nh=Math.min(8192,Math.round(canvas.height*scale));cleanSetProgress(20,'Upscaling with high-quality browser resampling…');setTimeout(()=>{const t=document.createElement('canvas');t.width=nw;t.height=nh;const tc=t.getContext('2d');tc.imageSmoothingEnabled=true;tc.imageSmoothingQuality='high';tc.drawImage(canvas,0,0,nw,nh);const out=cleanProcessCanvas(t,{denoise:12,sharp:55,clarity:28,light:5,autoColor:true,color:.03});cleanCommitCanvas(out,'Upscale '+scale+'× + Detail Recovery');cleanSetProgress(100,'Upscale complete.');toast('Upscale '+scale+'× complete')},60)};
+// Screenshot-inspired AI Toolbar — local processing only
+let cleanToolState={face:false,bgEnhance:false,bgBlur:false,color:false};
+function cleanToolToggle(id,key){$(id).onclick=()=>{cleanToolState[key]=!cleanToolState[key];$(id).classList.toggle('active',cleanToolState[key]);toast($(id).querySelector('b').textContent+' '+(cleanToolState[key]?'enabled':'disabled'))}}
+cleanToolToggle('cleanFaceBtn','face');cleanToolToggle('cleanBgEnhanceBtn','bgEnhance');cleanToolToggle('cleanBgBlurBtn','bgBlur');cleanToolToggle('cleanColorBtn','color');
+function cleanRadialMask(x,y,w,h){const dx=(x-w*.5)/(w*.34),dy=(y-h*.43)/(h*.48);return Math.max(0,Math.min(1,1-(dx*dx+dy*dy)));}
+function cleanApplyToolbar(srcCanvas,tools){
+  const w=srcCanvas.width,h=srcCanvas.height,c=document.createElement('canvas');c.width=w;c.height=h;const cx=c.getContext('2d',{willReadFrequently:true});cx.drawImage(srcCanvas,0,0);
+  if(tools.bgBlur){const blur=document.createElement('canvas');blur.width=w;blur.height=h;const bc=blur.getContext('2d');bc.filter='blur('+Math.max(2,Math.round(Math.min(w,h)*.012))+'px)';bc.drawImage(c,0,0);const bd=bc.getImageData(0,0,w,h).data,si=cx.getImageData(0,0,w,h).data;const mix=new ImageData(w,h),md=mix.data;for(let y=0;y<h;y++)for(let x=0;x<w;x++){const i=(y*w+x)*4,m=cleanRadialMask(x,y,w,h),bg=(1-m)*.92;md[i]=si[i]*m+bd[i]*bg;md[i+1]=si[i+1]*m+bd[i+1]*bg;md[i+2]=si[i+2]*m+bd[i+2]*bg;md[i+3]=255}cx.putImageData(mix,0,0)}
+  const im=cx.getImageData(0,0,w,h),d=im.data;
+  for(let y=1;y<h-1;y++)for(let x=1;x<w-1;x++){const i=(y*w+x)*4;let m=tools.face?cleanRadialMask(x,y,w,h):0;if(tools.face&&m>.05){for(let ch=0;ch<3;ch++){const edge=4*d[i+ch]-d[i-4+ch]-d[i+4+ch]-d[i-w*4+ch]-d[i+w*4+ch];const fd=(tools.faceDetail||45)/100; const safe=tools.faceSafe?(0.45+0.55*m):1; d[i+ch]=Math.max(0,Math.min(255,d[i+ch]+edge*(.18+.42*fd)*safe));}}if(tools.bgEnhance){const outer=1-cleanRadialMask(x,y,w,h),depth=(tools.bgDepth||35)/100;for(let ch=0;ch<3;ch++){d[i+ch]=Math.max(0,Math.min(255,d[i+ch]*(1+.04*depth*outer)+5*depth*outer));}}}
+  if(tools.color){for(let i=0;i<d.length;i+=4){const r=d[i],g=d[i+1],b=d[i+2],y=.2126*r+.7152*g+.0722*b;const contrast=(y-128)*.10;d[i]=Math.max(0,Math.min(255,r+contrast+3));d[i+1]=Math.max(0,Math.min(255,g+contrast+2));d[i+2]=Math.max(0,Math.min(255,b+contrast+1));}}
+  cx.putImageData(im,0,0);return c;
+}
+function cleanShowCompare(before,after){
+  const bw=Math.min(1200,before.width),bh=Math.round(before.height*bw/before.width);
+  ['cleanCompareBefore','cleanCompareAfter'].forEach(id=>{const q=$(id);q.width=bw;q.height=bh});
+  $('cleanCompareBefore').getContext('2d').drawImage(before,0,0,bw,bh);$('cleanCompareAfter').getContext('2d').drawImage(after,0,0,bw,bh);
+  cleanCompareSet($('cleanCompareRange').value);
+}
+function cleanCompareSet(v){v=Math.max(0,Math.min(100,+v));$('cleanAfterLayer').style.left=v+'%';$('cleanAfterLayer').style.width=(100-v)+'%';$('cleanCompareHandle').style.left=v+'%';}
+$('cleanCompareRange').oninput=e=>cleanCompareSet(e.target.value);
+$('cleanApplyToolsBtn').onclick=()=>{if(!active()){toast('Add an image first');return}if(!Object.values(cleanToolState).some(Boolean)){toast('Select at least one AI tool');return}const before=cleanCopyCanvas(canvas,canvas.width,canvas.height);cleanSetProgress(20,'Applying AI toolbar tools…');setTimeout(()=>{const out=cleanApplyToolbar(before,{...cleanToolState,faceSafe:$('cleanFaceSafe').checked,faceDetail:+$('cleanFaceDetail').value,bgDepth:+$('cleanBgDepth').value});cleanCommitCanvas(out,'AI Toolbar: '+Object.keys(cleanToolState).filter(k=>cleanToolState[k]).join(', '));cleanShowCompare(before,out);cleanSetProgress(100,'AI toolbar applied. Drag Before/After slider to compare.');toast('AI toolbar applied')},60)};
+$('cleanClearToolsBtn').onclick=()=>{cleanToolState={face:false,bgEnhance:false,bgBlur:false,color:false};['cleanFaceBtn','cleanBgEnhanceBtn','cleanBgBlurBtn','cleanColorBtn'].forEach(id=>$(id).classList.remove('active'));toast('AI toolbar cleared')};
+
+['cleanFaceDetail','cleanBgDepth','cleanDehaze','cleanTexture','cleanArtifact'].forEach(id=>{$(id).oninput=e=>$(id+'V').textContent=e.target.value});
+function cleanAdvancedOptions(){return {denoise:+$('cleanDenoise').value,sharp:+$('cleanSharp').value,clarity:+$('cleanClarity').value,light:+$('cleanLight').value,autoColor:$('cleanAutoColor').checked,color:0,faceDetail:+$('cleanFaceDetail').value,faceSafe:$('cleanFaceSafe').checked,dehaze:+$('cleanDehaze').value,texture:+$('cleanTexture').value,artifact:+$('cleanArtifact').value}}
+$('cleanAutoOptimizeBtn').onclick=()=>{if(!active()){toast('Add an image first');return}const d=ctx.getImageData(0,0,canvas.width,canvas.height).data;let sum=0,sum2=0,n=0;for(let i=0;i<d.length;i+=16){const y=.2126*d[i]+.7152*d[i+1]+.0722*d[i+2];sum+=y;sum2+=y*y;n++}const avg=sum/n,sd=Math.sqrt(Math.max(0,sum2/n-avg*avg));$('cleanDenoise').value=Math.round(Math.max(12,Math.min(62,38-sd*.18)));$('cleanSharp').value=Math.round(Math.max(20,Math.min(72,48+sd*.08)));$('cleanClarity').value=Math.round(Math.max(15,Math.min(65,30+sd*.12)));$('cleanLight').value=Math.round(Math.max(0,Math.min(60,(128-avg)*.55)));$('cleanDehaze').value=Math.round(Math.max(0,Math.min(55,18+(128-avg)*.12)));$('cleanTexture').value=28;$('cleanArtifact').value=22;['cleanDenoise','cleanSharp','cleanClarity','cleanLight','cleanDehaze','cleanTexture','cleanArtifact'].forEach(id=>$(id+'V').textContent=$(id).value);$('cleanAdvancedStatus').textContent='Settings optimized from brightness and contrast. Press Smart Clean to apply.';toast('Auto Optimize ready')};
+$('cleanPreviewToolsBtn').onclick=()=>{if(!active()){toast('Add an image first');return}const before=cleanCopyCanvas(canvas,canvas.width,canvas.height),o=cleanAdvancedOptions();const out=cleanProcessCanvas(before,o);cleanShowCompare(before,out);$('cleanAdvancedStatus').textContent='Preview generated. The main image has not been changed yet.';toast('Preview ready — main image unchanged')};
+
+$('qualityScanBtn').onclick=()=>{if(!active()){toast('Add an image first');return}const d=ctx.getImageData(0,0,canvas.width,canvas.height).data;let sum=0,sum2=0,n=0;for(let i=0;i<d.length;i+=16){const y=.2126*d[i]+.7152*d[i+1]+.0722*d[i+2];sum+=y;sum2+=y*y;n++}const avg=sum/n,sd=Math.sqrt(Math.max(0,sum2/n-avg*avg));const noise=Math.max(0,Math.min(100,Math.round(48-sd*.38)));$('qualityScanResult').innerHTML='<b>'+canvas.width+' × '+canvas.height+' px</b><br>Brightness: '+Math.round(avg)+'/255 · Contrast: '+Math.round(sd)+' · Estimated noise: '+noise+'%';toast('Quality scan complete')};
+
+updateUI();renderHistory();
+})();
+</script>
+</body>
+</html>
